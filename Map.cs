@@ -24,31 +24,31 @@ namespace ConsoleApp46
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if(mas[i, j] == (char)1)
+                    else if(mas[i, j] == '&')
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if(mas[i, j] == (char)3)
+                    else if(mas[i, j] == 'H')
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if (mas[i, j] == (char)19)
+                    else if (mas[i, j] == '+')
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if (mas[i, j] == (char)0177)
+                    else if (mas[i, j] == '%')
                     {
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if (mas[i, j] == (char)2)
+                    else if (mas[i, j] == '@')
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write(mas[i, j] + " ");
@@ -75,11 +75,11 @@ namespace ConsoleApp46
                     mas[i, j] = '.';
                     if (count < 2)
                     {
-                        mas[i, j] = (char)1;
+                        mas[i, j] = '&';
                     }
                     if(count >= 98)
                     {
-                        mas[i, j] = (char)3;
+                        mas[i, j] = 'H';
                     }
                     if(count >= 10 && count < 20)
                     {
@@ -87,14 +87,14 @@ namespace ConsoleApp46
                         int Y = j;
                         for (int t = 0; t < 10; t++)
                         {
-                            mas[X++,Y++] = (char)0177;
+                            mas[X++,Y++] = '%';
                             if (X > mas.GetLength(0) - 1 || Y > mas.GetLength(1) - 1)
                                 break;
                         }
                     }
                     if (levelWorld>1)
                     {
-                        mas[mas.GetLength(0)/4,mas.GetLength(1)/2] = (char)19;
+                        mas[mas.GetLength(0)/4,mas.GetLength(1)/2] = '+';
                     }
                 }
             }
@@ -122,7 +122,7 @@ namespace ConsoleApp46
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i, j] = (char)2;
+                        mas[i, j] = '@';
                     }
                     if(i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
@@ -160,7 +160,7 @@ namespace ConsoleApp46
 
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i, j] = (char)2;
+                        mas[i, j] = '@';
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
@@ -194,7 +194,7 @@ namespace ConsoleApp46
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i, j] = (char)2;
+                        mas[i, j] = '@';
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
@@ -228,7 +228,7 @@ namespace ConsoleApp46
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i, j] = (char)2;
+                        mas[i, j] = '@';
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
@@ -246,7 +246,7 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if (mas[i,j] == (char)1 || mas[i, j] == '0')
+                    if (mas[i,j] == '&' || mas[i, j] == '0')
                     {
                         return false;
                     }
@@ -294,7 +294,7 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if (mas[i, j] == (char)3)
+                    if (mas[i, j] == 'H')
                     {
                         Hero.coin += 100;
                     }
@@ -338,20 +338,20 @@ namespace ConsoleApp46
 
             switch (key)
             {
-                case (char)1:
+                case '&':
                     Batle(Hero, mas);
                     break;
-                case (char)3:
+                case 'H':
                     Heart(Hero, mas);
                     break;
                 case '0':
                     levelWorld++;
                     Portal(Hero, mas);
                     break;
-                case (char)19:
+                case '+':
                     Forge(Hero);
                     break;
-                case (char)0177:
+                case '%':
                     return false;
                 default:
                     break;
