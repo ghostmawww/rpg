@@ -11,7 +11,7 @@ namespace ConsoleApp46
     {
         static public int levelWorld = 1;
         static Random rnd = new Random();
-        
+
         static public void GetMap(char[,] mas)
         {
             for (int i = 0; i < mas.GetLength(0); i++)
@@ -24,13 +24,13 @@ namespace ConsoleApp46
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if(mas[i, j] == '&')
+                    else if (mas[i, j] == '&')
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    else if(mas[i, j] == 'H')
+                    else if (mas[i, j] == 'H')
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write(mas[i, j] + " ");
@@ -53,7 +53,15 @@ namespace ConsoleApp46
                         Console.ForegroundColor = ConsoleColor.Cyan;
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
-                    } else
+                    }
+                    
+                    else if (mas[i, j] == '^')
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.Write(mas[i, j] + " ");
+                        Console.ResetColor();
+                    }
+                    else
                     {
                         Console.Write(mas[i, j] + " ");
                     }
@@ -61,11 +69,11 @@ namespace ConsoleApp46
                 Console.WriteLine();
             }
             Console.WriteLine();
-            
         }
+
         static public void Array(char[,] mas)
         {
-            Random rnd = new Random();
+            
             for (int i = 0; i < mas.GetLength(0); i++)
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
@@ -77,69 +85,114 @@ namespace ConsoleApp46
                     {
                         mas[i, j] = '&';
                     }
-                    if(count >= 98)
+                    if (count >= 98)
                     {
                         mas[i, j] = 'H';
                     }
-                    if(count >= 10 && count < 20)
+                    if (count >= 10 && count < 20)
                     {
                         int X = i;
                         int Y = j;
                         for (int t = 0; t < 10; t++)
                         {
-                            mas[X++,Y++] = '%';
+                            mas[X++, Y++] = '%';
                             if (X > mas.GetLength(0) - 1 || Y > mas.GetLength(1) - 1)
                                 break;
                         }
                     }
-                    if (levelWorld>1)
+                    if (levelWorld > 1)
                     {
-                        mas[mas.GetLength(0)/4,mas.GetLength(1)/2] = '+';
+                        mas[mas.GetLength(0) / 4, mas.GetLength(1) / 2] = '+';
                     }
                 }
             }
+
+            
+            int mountainRanges = rnd.Next(2, 6); 
+
+            for (int m = 0; m < mountainRanges; m++)
+            {
+                
+                int x = rnd.Next(5, mas.GetLength(0) - 5);
+                int y = rnd.Next(5, mas.GetLength(1) - 5);
+                int length = rnd.Next(6, 12); 
+
+                
+                int mainDirection = rnd.Next(4);
+
+                for (int step = 0; step < length; step++)
+                {
+                    if (x >= 1 && x < mas.GetLength(0) - 1 && y >= 1 && y < mas.GetLength(1) - 1)
+                    {
+                        mas[x, y] = '^'; 
+
+                        
+                        if (rnd.Next(100) < 30)
+                        {
+                            
+                            if (mainDirection == 0 || mainDirection == 2) 
+                            {
+                                mainDirection = (rnd.Next(2) == 0) ? 1 : 3; 
+                            }
+                            else 
+                            {
+                                mainDirection = (rnd.Next(2) == 0) ? 0 : 2; 
+                            }
+                        }
+
+                       
+                        switch (mainDirection)
+                        {
+                            case 0: x--; break; 
+                            case 1: y++; break; 
+                            case 2: x++; break; 
+                            case 3: y--; break; 
+                        }
+                    }
+                }
+            }
+
+            
         }
+
         static public void UpArray(char[,] mas)
         {
             char[] temp = new char[mas.GetLength(0)];
 
-
-            for (int i = (mas.GetLength(0)-1); i >= 0; i--)
+            for (int i = (mas.GetLength(0) - 1); i >= 0; i--)
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if(i == (mas.GetLength(0) - 1))
+                    if (i == (mas.GetLength(0) - 1))
                     {
-                         temp[j] = mas[i,j];
+                        temp[j] = mas[i, j];
                     }
                     else if (i == 0)
                     {
-                        mas[i,j] = temp[j];
+                        mas[i, j] = temp[j];
                     }
-                    if (i != 0 )
+                    if (i != 0)
                     {
-                        mas[i,j] = mas[i-1,j];
+                        mas[i, j] = mas[i - 1, j];
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
                         mas[i, j] = '@';
                     }
-                    if(i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
+                    if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i +1, j] = '.';
+                        mas[i + 1, j] = '.';
                     }
                 }
             }
 
             GetMap(mas);
             Win(mas);
-
-
         }
+
         static public void DownArray(char[,] mas)
         {
             char[] temp = new char[mas.GetLength(0)];
-
 
             for (int i = 0; i < mas.GetLength(0); i++)
             {
@@ -149,11 +202,11 @@ namespace ConsoleApp46
                     {
                         temp[j] = mas[i, j];
                     }
-                    else if (i == (mas.GetLength(0)-1))
+                    else if (i == (mas.GetLength(0) - 1))
                     {
                         mas[i, j] = temp[j];
                     }
-                    if (i != (mas.GetLength(0)-1))
+                    if (i != (mas.GetLength(0) - 1))
                     {
                         mas[i, j] = mas[i + 1, j];
                     }
@@ -166,21 +219,21 @@ namespace ConsoleApp46
                     {
                         mas[i - 1, j] = '.';
                     }
-
                 }
             }
             GetMap(mas);
             Win(mas);
         }
+
         static public void LeftArray(char[,] mas)
         {
             char[] temp = new char[mas.GetLength(1)];
 
             for (int i = 0; i < mas.GetLength(0); i++)
             {
-                for (int j = (mas.GetLength(1)-1); j >=0; j--)
+                for (int j = (mas.GetLength(1) - 1); j >= 0; j--)
                 {
-                    if (j == (mas.GetLength(1)-1))
+                    if (j == (mas.GetLength(1) - 1))
                     {
                         temp[i] = mas[i, j];
                     }
@@ -190,7 +243,7 @@ namespace ConsoleApp46
                     }
                     if (j != 0)
                     {
-                        mas[i, j] = mas[i, j-1];
+                        mas[i, j] = mas[i, j - 1];
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
@@ -198,14 +251,14 @@ namespace ConsoleApp46
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i , j+1] = '.';
+                        mas[i, j + 1] = '.';
                     }
-
                 }
             }
             GetMap(mas);
             Win(mas);
         }
+
         static public void RightArray(char[,] mas)
         {
             char[] temp = new char[mas.GetLength(1)];
@@ -232,39 +285,38 @@ namespace ConsoleApp46
                     }
                     if (i == (mas.GetLength(0) - 1) / 2 && j == (mas.GetLength(1) - 1) / 2)
                     {
-                        mas[i, j-1] = '.';
+                        mas[i, j - 1] = '.';
                     }
-
                 }
             }
             GetMap(mas);
             Win(mas);
         }
+
         static bool Win(char[,] mas)
         {
             for (int i = 0; i < mas.GetLength(0); i++)
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if (mas[i,j] == '&' || mas[i, j] == '0')
+                    if (mas[i, j] == '&' || mas[i, j] == '0')
                     {
                         return false;
                     }
                 }
             }
-            
-            mas[10, 10] = '0';
 
+            mas[10, 10] = '0';
             return true;
         }
 
-        static void Batle(Person Hero, char[,]mas)
+        static void Batle(Person Hero, char[,] mas)
         {
             Console.Clear();
-            Person Enemy = new Person(Map.levelWorld*10);
-            Random rnd  = new Random();
+            Person Enemy = new Person(Map.levelWorld * 10);
+            Random rnd = new Random();
 
-            while(Enemy.HP > 0 && Hero.HP > 0)
+            while (Enemy.HP > 0 && Hero.HP > 0)
             {
                 int Shot = rnd.Next(10);
                 Enemy.HP -= Shot + Hero.Strenght;
@@ -281,13 +333,14 @@ namespace ConsoleApp46
                 Console.WriteLine($"Поражение");
             }
         }
+
         static void Heart(Person Hero, char[,] mas)
         {
             Console.Clear();
             Hero.MaxHP += 10;
-            Hero.HP += Hero.MaxHP/10;
-
+            Hero.HP += Hero.MaxHP / 10;
         }
+
         static void Portal(Person Hero, char[,] mas)
         {
             for (int i = 0; i < mas.GetLength(0); i++)
@@ -303,16 +356,17 @@ namespace ConsoleApp46
             Hero.HP = Hero.MaxHP;
             Array(mas);
         }
+
         static void Forge(Person Hero)
         {
-
             Console.WriteLine("Выберите действие");
             Console.WriteLine("1. Улучшить силу на 2");
             Console.WriteLine("Для выхода нажмите Enter");
             Console.WriteLine($"Оставшиеся деньги {Hero.coin}");
 
             ConsoleKey key;
-            while ((key = Console.ReadKey().Key) != ConsoleKey.Enter){
+            while ((key = Console.ReadKey().Key) != ConsoleKey.Enter)
+            {
                 switch (key)
                 {
                     case ConsoleKey.NumPad1:
@@ -328,11 +382,11 @@ namespace ConsoleApp46
                             Console.WriteLine("Недостаточно деняк");
                         }
                         break;
-
                 }
             }
         }
-        static public bool GetIvent(Person Hero, char[,] mas,int A = 0, int B = 0)
+
+        static public bool GetIvent(Person Hero, char[,] mas, int A = 0, int B = 0)
         {
             char key = mas[((mas.GetLength(0) - 1) / 2) + A, ((mas.GetLength(1) - 1) / 2) + B];
 
@@ -353,12 +407,15 @@ namespace ConsoleApp46
                     break;
                 case '%':
                     return false;
+                case '^':
+                    Console.SetCursorPosition(0, 26);
+                    Console.WriteLine("Вы не можете пройти через горы!");
+                    System.Threading.Thread.Sleep(500);
+                    return false;
                 default:
                     break;
             }
             return true;
-
         }
-
     }
 }
