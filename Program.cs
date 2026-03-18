@@ -55,7 +55,6 @@ namespace ConsoleApp46
                         break;
 
                         
-                }
                 Person.GetCharacter(hero);
             }
         }
