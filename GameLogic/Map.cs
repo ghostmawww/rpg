@@ -7,13 +7,16 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp46
 {
-    internal class Map
+    public class Map
     {
         static public int levelWorld = 1;
         static Random rnd = new Random();
 
         static public void GetMap(char[,] mas)
         {
+            
+            Console.Clear();
+
             for (int i = 0; i < mas.GetLength(0); i++)
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
@@ -54,7 +57,6 @@ namespace ConsoleApp46
                         Console.Write(mas[i, j] + " ");
                         Console.ResetColor();
                     }
-                    
                     else if (mas[i, j] == '^')
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -68,7 +70,6 @@ namespace ConsoleApp46
                 }
                 Console.WriteLine();
             }
-            Console.WriteLine();
         }
 
         static public void Array(char[,] mas)
@@ -78,81 +79,289 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
+                    mas[i, j] = '.';
+                }
+            }
+
+            
+            for (int i = 0; i < mas.GetLength(0); i++)
+            {
+                for (int j = 0; j < mas.GetLength(1); j++)
+                {
                     int count = rnd.Next(100);
 
-                    mas[i, j] = '.';
-                    if (count < 2)
+                    if (count < 5)
                     {
                         mas[i, j] = '&';
                     }
-                    if (count >= 98)
+                }
+            }
+
+            
+            for (int i = 0; i < mas.GetLength(0); i++)
+            {
+                for (int j = 0; j < mas.GetLength(1); j++)
+                {
+                    int count = rnd.Next(100);
+
+                    if (count < 5 && mas[i, j] == '.')
                     {
                         mas[i, j] = 'H';
                     }
-                    if (count >= 10 && count < 20)
-                    {
-                        int X = i;
-                        int Y = j;
-                        for (int t = 0; t < 10; t++)
-                        {
-                            mas[X++, Y++] = '%';
-                            if (X > mas.GetLength(0) - 1 || Y > mas.GetLength(1) - 1)
-                                break;
-                        }
-                    }
-                    if (levelWorld > 1)
-                    {
-                        mas[mas.GetLength(0) / 4, mas.GetLength(1) / 2] = '+';
-                    }
                 }
             }
 
             
-            int mountainRanges = rnd.Next(2, 6); 
-
-            for (int m = 0; m < mountainRanges; m++)
+            for (int i = 0; i < mas.GetLength(0); i++)
             {
-                
-                int x = rnd.Next(5, mas.GetLength(0) - 5);
-                int y = rnd.Next(5, mas.GetLength(1) - 5);
-                int length = rnd.Next(6, 12); 
-
-                
-                int mainDirection = rnd.Next(4);
-
-                for (int step = 0; step < length; step++)
+                for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if (x >= 1 && x < mas.GetLength(0) - 1 && y >= 1 && y < mas.GetLength(1) - 1)
+                    int count = rnd.Next(100);
+
+                    if (count >= 10 && count < 15 && mas[i, j] == '.')
                     {
-                        mas[x, y] = '^'; 
+                        mas[i, j] = '%';
+                    }
+                }
+            }
 
-                        
-                        if (rnd.Next(100) < 30)
-                        {
-                            
-                            if (mainDirection == 0 || mainDirection == 2) 
-                            {
-                                mainDirection = (rnd.Next(2) == 0) ? 1 : 3; 
-                            }
-                            else 
-                            {
-                                mainDirection = (rnd.Next(2) == 0) ? 0 : 2; 
-                            }
-                        }
+            
+            if (levelWorld > 1)
+            {
+                mas[mas.GetLength(0) / 4, mas.GetLength(1) / 2] = '+';
+            }
 
-                       
-                        switch (mainDirection)
+            int centerX = (mas.GetLength(0) - 1) / 2;
+            int centerY = (mas.GetLength(1) - 1) / 2;
+
+            
+            for (int i = centerX - 1; i <= centerX + 1; i++)
+            {
+                for (int j = centerY - 1; j <= centerY + 1; j++)
+                {
+                    if (i >= 0 && i < mas.GetLength(0) && j >= 0 && j < mas.GetLength(1))
+                    {
+                        mas[i, j] = '.';
+                    }
+                }
+            }
+
+            
+            for (int k = 0; k < 3; k++)
+            {
+                int enemyX = centerX - 3 + rnd.Next(7);
+                int enemyY = centerY - 3 + rnd.Next(7);
+                if (enemyX >= 0 && enemyX < mas.GetLength(0) && enemyY >= 0 && enemyY < mas.GetLength(1))
+                {
+                    if (mas[enemyX, enemyY] == '.')
+                        mas[enemyX, enemyY] = '&';
+                }
+            }
+
+           
+            for (int k = 0; k < 5; k++)
+            {
+                int heartX = centerX - 4 + rnd.Next(9);
+                int heartY = centerY - 4 + rnd.Next(9);
+                if (heartX >= 0 && heartX < mas.GetLength(0) && heartY >= 0 && heartY < mas.GetLength(1))
+                {
+                    if (mas[heartX, heartY] == '.')
+                        mas[heartX, heartY] = 'H';
+                }
+            }
+
+            mas[centerX, centerY] = '.';
+
+            
+            int mountainCount = rnd.Next(4, 8); 
+
+            for (int m = 0; m < mountainCount; m++)
+            {
+                int mountainX, mountainY;
+                int attempts = 0;
+                do
+                {
+                    mountainX = rnd.Next(4, mas.GetLength(0) - 4);
+                    mountainY = rnd.Next(4, mas.GetLength(1) - 4);
+                    attempts++;
+                    if (attempts > 300) break;
+                }
+                
+                while (Math.Abs(mountainX - centerX) < 3 && Math.Abs(mountainY - centerY) < 3);
+
+                
+                bool isLargeMountain = rnd.Next(100) < 40;
+                CreateMountain(mas, mountainX, mountainY, isLargeMountain);
+            }
+        }
+
+        
+        public static bool HasEnemies(char[,] mas)
+        {
+            for (int i = 0; i < mas.GetLength(0); i++)
+            {
+                for (int j = 0; j < mas.GetLength(1); j++)
+                {
+                    if (mas[i, j] == '&')
+                    {
+                        return true; 
+                    }
+                }
+            }
+            return false; 
+        }
+
+        
+        public static void CheckAndSpawnPortal(char[,] mas)
+        {
+           
+            if (!HasEnemies(mas) && !IsPortalOnMap(mas))
+            {
+                int centerX = (mas.GetLength(0) - 1) / 2;
+                int centerY = (mas.GetLength(1) - 1) / 2;
+
+                int portalX, portalY;
+                int attempts = 0;
+                do
+                {
+                    portalX = rnd.Next(2, mas.GetLength(0) - 2);
+                    portalY = rnd.Next(2, mas.GetLength(1) - 2);
+                    attempts++;
+                    if (attempts > 200) break;
+                }
+                while (Math.Abs(portalX - centerX) < 3 && Math.Abs(portalY - centerY) < 3 && mas[portalX, portalY] != '.');
+
+                
+                mas[portalX, portalY] = '0';
+            }
+        }
+
+       
+        private static bool IsPortalOnMap(char[,] mas)
+        {
+            for (int i = 0; i < mas.GetLength(0); i++)
+            {
+                for (int j = 0; j < mas.GetLength(1); j++)
+                {
+                    if (mas[i, j] == '0')
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static void CreateMountain(char[,] mas, int centerX, int centerY, bool isLarge = false)
+        {
+            if (centerX >= 0 && centerX < mas.GetLength(0) && centerY >= 0 && centerY < mas.GetLength(1))
+            {
+                mas[centerX, centerY] = '^';
+            }
+
+            
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dx == 0 && dy == 0) continue;
+
+                    int x = centerX + dx;
+                    int y = centerY + dy;
+
+                    if (x >= 0 && x < mas.GetLength(0) && y >= 0 && y < mas.GetLength(1))
+                    {
+                        if (mas[x, y] != '@' && mas[x, y] != '0' && mas[x, y] != '+')
                         {
-                            case 0: x--; break; 
-                            case 1: y++; break; 
-                            case 2: x++; break; 
-                            case 3: y--; break; 
+                            mas[x, y] = '^';
                         }
                     }
                 }
             }
 
             
+            int probability2 = isLarge ? 45 : 35; 
+
+            for (int dx = -2; dx <= 2; dx++)
+            {
+                for (int dy = -2; dy <= 2; dy++)
+                {
+                    if (Math.Abs(dx) == 2 || Math.Abs(dy) == 2)
+                    {
+                        int x = centerX + dx;
+                        int y = centerY + dy;
+
+                        if (x >= 0 && x < mas.GetLength(0) && y >= 0 && y < mas.GetLength(1))
+                        {
+                            if (rnd.Next(100) < probability2)
+                            {
+                                if (mas[x, y] != '@' && mas[x, y] != '0' && mas[x, y] != '+')
+                                {
+                                    mas[x, y] = '^';
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            bool addThirdCircle = isLarge ? (rnd.Next(100) < 80) : (rnd.Next(100) < 40); 
+
+            if (addThirdCircle)
+            {
+                int probability3 = isLarge ? 35 : 25; 
+
+                for (int dx = -3; dx <= 3; dx++)
+                {
+                    for (int dy = -3; dy <= 3; dy++)
+                    {
+                        if (Math.Abs(dx) == 3 || Math.Abs(dy) == 3)
+                        {
+                            int x = centerX + dx;
+                            int y = centerY + dy;
+
+                            if (x >= 0 && x < mas.GetLength(0) && y >= 0 && y < mas.GetLength(1))
+                            {
+                                if (rnd.Next(100) < probability3)
+                                {
+                                    if (mas[x, y] != '@' && mas[x, y] != '0' && mas[x, y] != '+')
+                                    {
+                                        mas[x, y] = '^';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            
+            if (isLarge && rnd.Next(100) < 20)
+            {
+                for (int dx = -4; dx <= 4; dx++)
+                {
+                    for (int dy = -4; dy <= 4; dy++)
+                    {
+                        if (Math.Abs(dx) == 4 || Math.Abs(dy) == 4)
+                        {
+                            int x = centerX + dx;
+                            int y = centerY + dy;
+
+                            if (x >= 0 && x < mas.GetLength(0) && y >= 0 && y < mas.GetLength(1))
+                            {
+                                if (rnd.Next(100) < 20) 
+                                {
+                                    if (mas[x, y] != '@' && mas[x, y] != '0' && mas[x, y] != '+')
+                                    {
+                                        mas[x, y] = '^';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         static public void UpArray(char[,] mas)
@@ -186,8 +395,8 @@ namespace ConsoleApp46
                 }
             }
 
-            GetMap(mas);
-            Win(mas);
+            
+            CheckAndSpawnPortal(mas);
         }
 
         static public void DownArray(char[,] mas)
@@ -221,8 +430,9 @@ namespace ConsoleApp46
                     }
                 }
             }
-            GetMap(mas);
-            Win(mas);
+
+
+            CheckAndSpawnPortal(mas);
         }
 
         static public void LeftArray(char[,] mas)
@@ -255,8 +465,8 @@ namespace ConsoleApp46
                     }
                 }
             }
-            GetMap(mas);
-            Win(mas);
+
+            CheckAndSpawnPortal(mas);
         }
 
         static public void RightArray(char[,] mas)
@@ -289,8 +499,9 @@ namespace ConsoleApp46
                     }
                 }
             }
-            GetMap(mas);
-            Win(mas);
+
+            
+            CheckAndSpawnPortal(mas);
         }
 
         static bool Win(char[,] mas)
@@ -299,14 +510,12 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < mas.GetLength(1); j++)
                 {
-                    if (mas[i, j] == '&' || mas[i, j] == '0')
+                    if (mas[i, j] == '&')
                     {
                         return false;
                     }
                 }
             }
-
-            mas[10, 10] = '0';
             return true;
         }
 
@@ -331,6 +540,7 @@ namespace ConsoleApp46
             {
                 Console.Clear();
                 Console.WriteLine($"Поражение");
+                Console.ReadKey();
             }
         }
 
@@ -354,6 +564,7 @@ namespace ConsoleApp46
                 }
             }
             Hero.HP = Hero.MaxHP;
+            levelWorld++;
             Array(mas);
         }
 
@@ -399,7 +610,6 @@ namespace ConsoleApp46
                     Heart(Hero, mas);
                     break;
                 case '0':
-                    levelWorld++;
                     Portal(Hero, mas);
                     break;
                 case '+':
@@ -408,9 +618,6 @@ namespace ConsoleApp46
                 case '%':
                     return false;
                 case '^':
-                    Console.SetCursorPosition(0, 26);
-                    Console.WriteLine("Вы не можете пройти через горы!");
-                    System.Threading.Thread.Sleep(500);
                     return false;
                 default:
                     break;
