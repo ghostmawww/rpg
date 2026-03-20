@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ConsoleApp46
 {
@@ -11,9 +7,7 @@ namespace ConsoleApp46
         public int MaxHP = 100;
         public int HP = 100;
         public int Strenght = 0;
-
         public int coin = 0;
-
         public string NamePerson;
 
         public Person(int HP = 100, string Name = "Враг")
@@ -21,7 +15,6 @@ namespace ConsoleApp46
             NamePerson = Name;
             this.HP = HP;
         }
-
 
         static public void GetCharacter(Person Hero)
         {
@@ -31,6 +24,5 @@ namespace ConsoleApp46
             Console.WriteLine($"Деняк = {Hero.coin}");
             Console.WriteLine($"Уровень мира = {Map.levelWorld}");
         }
-
     }
 }

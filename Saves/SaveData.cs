@@ -5,7 +5,6 @@ using System.Xml.Serialization;
 
 namespace ConsoleApp46
 {
-    
     [Serializable]
     public class SaveData
     {
@@ -15,6 +14,8 @@ namespace ConsoleApp46
         public int PlayerStrength { get; set; }
         public int PlayerCoins { get; set; }
         public int WorldLevel { get; set; }
+        public int PlayerX { get; set; }
+        public int PlayerY { get; set; }
         public List<string> MapRows { get; set; }
         public DateTime SaveTime { get; set; }
 
@@ -24,7 +25,7 @@ namespace ConsoleApp46
             SaveTime = DateTime.Now;
         }
 
-        public SaveData(Person hero, char[,] map)
+        public SaveData(Person hero, char[,] map, int playerX, int playerY)
         {
             PlayerName = hero.NamePerson;
             PlayerHP = hero.HP;
@@ -32,6 +33,8 @@ namespace ConsoleApp46
             PlayerStrength = hero.Strenght;
             PlayerCoins = hero.coin;
             WorldLevel = Map.levelWorld;
+            PlayerX = playerX;
+            PlayerY = playerY;
             MapRows = new List<string>();
             SaveTime = DateTime.Now;
 
@@ -59,12 +62,12 @@ namespace ConsoleApp46
             return map;
         }
 
-        public static void Save(Person hero, char[,] map, string fileName)
+        public static void Save(Person hero, char[,] map, string fileName, int playerX, int playerY)
         {
             if (!Directory.Exists("Saves"))
                 Directory.CreateDirectory("Saves");
 
-            SaveData data = new SaveData(hero, map);
+            SaveData data = new SaveData(hero, map, playerX, playerY);
             XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
 
             using (StreamWriter writer = new StreamWriter($"Saves/{fileName}.xml"))
@@ -75,7 +78,7 @@ namespace ConsoleApp46
             Console.WriteLine($"Игра сохранена в файл: {fileName}.xml");
         }
 
-        public static bool Load(string fileName, Person hero, char[,] map)
+        public static bool Load(string fileName, Person hero, char[,] map, ref int playerX, ref int playerY)
         {
             string path = $"Saves/{fileName}.xml";
 
@@ -98,6 +101,8 @@ namespace ConsoleApp46
                     hero.Strenght = data.PlayerStrength;
                     hero.coin = data.PlayerCoins;
                     Map.levelWorld = data.WorldLevel;
+                    playerX = data.PlayerX;
+                    playerY = data.PlayerY;
 
                     char[,] loadedMap = data.GetMap();
                     for (int i = 0; i < map.GetLength(0); i++)
