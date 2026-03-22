@@ -21,75 +21,137 @@ namespace ConsoleApp46
 
         public SaveData()
         {
-            MapRows = new List<string>();
-            SaveTime = DateTime.Now;
+            try
+            {
+                MapRows = new List<string>();
+                SaveTime = DateTime.Now;
+            }
+            catch (Exception ex)
+            {
+                // Используем конструктор с 4 параметрами (message, errorCode, component, innerException)
+                throw new GameException("Ошибка инициализации SaveData", "S001", "SaveSystem", ex);
+            }
         }
 
         public SaveData(Person hero, char[,] map, int playerX, int playerY)
         {
-            PlayerName = hero.NamePerson;
-            PlayerHP = hero.HP;
-            PlayerMaxHP = hero.MaxHP;
-            PlayerStrength = hero.Strenght;
-            PlayerCoins = hero.coin;
-            WorldLevel = Map.levelWorld;
-            PlayerX = playerX;
-            PlayerY = playerY;
-            MapRows = new List<string>();
-            SaveTime = DateTime.Now;
-
-            for (int i = 0; i < map.GetLength(0); i++)
+            try
             {
-                string row = "";
-                for (int j = 0; j < map.GetLength(1); j++)
+                if (hero == null)
+                    throw new GameException("Объект героя не инициализирован", "S002", "SaveSystem", ErrorSeverity.High);
+                if (map == null)
+                    throw new GameException("Карта не инициализирована", "S003", "SaveSystem", ErrorSeverity.High);
+
+                PlayerName = hero.NamePerson ?? "Безымянный";
+                PlayerHP = hero.HP;
+                PlayerMaxHP = hero.MaxHP;
+                PlayerStrength = hero.Strenght;
+                PlayerCoins = hero.coin;
+                WorldLevel = Map.levelWorld;
+                PlayerX = playerX;
+                PlayerY = playerY;
+                MapRows = new List<string>();
+                SaveTime = DateTime.Now;
+
+                for (int i = 0; i < map.GetLength(0); i++)
                 {
-                    row += map[i, j];
+                    string row = "";
+                    for (int j = 0; j < map.GetLength(1); j++)
+                        row += map[i, j];
+                    MapRows.Add(row);
                 }
-                MapRows.Add(row);
+            }
+            catch (GameException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                // Используем конструктор с 4 параметрами (message, errorCode, component, innerException)
+                throw new GameException("Ошибка при создании сохранения", "S004", "SaveSystem", ex);
             }
         }
 
         public char[,] GetMap()
         {
-            int height = MapRows.Count;
-            int width = MapRows[0].Length;
-            char[,] map = new char[height, width];
+            try
+            {
+                if (MapRows == null || MapRows.Count == 0)
+                    throw new GameException("Нет данных для восстановления карты", "S005", "SaveSystem", ErrorSeverity.High);
 
-            for (int i = 0; i < height; i++)
-                for (int j = 0; j < width; j++)
-                    map[i, j] = MapRows[i][j];
+                int height = MapRows.Count;
+                int width = MapRows[0].Length;
+                char[,] map = new char[height, width];
 
-            return map;
+                for (int i = 0; i < height; i++)
+                    for (int j = 0; j < width; j++)
+                        map[i, j] = MapRows[i][j];
+
+                return map;
+            }
+            catch (GameException ex)
+            {
+                Console.WriteLine(ex.GetShortMessage());
+                return null;
+            }
         }
 
         public static void Save(Person hero, char[,] map, string fileName, int playerX, int playerY)
         {
-            if (!Directory.Exists("Saves"))
-                Directory.CreateDirectory("Saves");
-
-            SaveData data = new SaveData(hero, map, playerX, playerY);
-            XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
-
-            using (StreamWriter writer = new StreamWriter($"Saves/{fileName}.xml"))
+            try
             {
-                serializer.Serialize(writer, data);
-            }
+                if (string.IsNullOrWhiteSpace(fileName))
+                    throw new GameException("Имя файла не может быть пустым", "S006", "SaveSystem", ErrorSeverity.Medium);
 
-            Console.WriteLine($"Игра сохранена в файл: {fileName}.xml");
+                if (!Directory.Exists("Saves"))
+                    Directory.CreateDirectory("Saves");
+
+                SaveData data = new SaveData(hero, map, playerX, playerY);
+                XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
+
+                using (StreamWriter writer = new StreamWriter($"Saves/{fileName}.xml"))
+                {
+                    serializer.Serialize(writer, data);
+                }
+
+                Console.WriteLine($"Игра сохранена в файл: {fileName}.xml");
+            }
+            catch (GameException ex)
+            {
+                Console.WriteLine(ex.GetShortMessage());
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"Нет прав для сохранения файла: {ex.Message}");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка ввода-вывода при сохранении: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Неизвестная ошибка при сохранении: {ex.Message}");
+            }
         }
 
         public static bool Load(string fileName, Person hero, char[,] map, ref int playerX, ref int playerY)
         {
-            string path = $"Saves/{fileName}.xml";
-
-            if (!File.Exists(path))
-            {
-                Console.WriteLine("Файл сохранения не найден!");
-                return false;
-            }
-
             try
             {
+                if (string.IsNullOrWhiteSpace(fileName))
+                    throw new GameException("Имя файла не может быть пустым", "S007", "SaveSystem", ErrorSeverity.Medium);
+                if (hero == null)
+                    throw new GameException("Объект героя не инициализирован", "S008", "SaveSystem", ErrorSeverity.High);
+                if (map == null)
+                    throw new GameException("Карта не инициализирована", "S009", "SaveSystem", ErrorSeverity.High);
+
+                string path = $"Saves/{fileName}.xml";
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine("Файл сохранения не найден!");
+                    return false;
+                }
+
                 XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
                 using (StreamReader reader = new StreamReader(path))
                 {
@@ -113,9 +175,24 @@ namespace ConsoleApp46
                     return true;
                 }
             }
-            catch
+            catch (FileNotFoundException ex)
             {
-                Console.WriteLine("Ошибка при загрузке файла!");
+                Console.WriteLine($"Файл не найден: {ex.Message}");
+                return false;
+            }
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Ошибка формата XML: {ex.Message}");
+                return false;
+            }
+            catch (GameException ex)
+            {
+                Console.WriteLine(ex.GetShortMessage());
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Неизвестная ошибка при загрузке: {ex.Message}");
                 return false;
             }
         }
@@ -124,13 +201,22 @@ namespace ConsoleApp46
         {
             List<string> saves = new List<string>();
 
-            if (Directory.Exists("Saves"))
+            try
             {
-                string[] files = Directory.GetFiles("Saves", "*.xml");
-                foreach (string file in files)
+                if (Directory.Exists("Saves"))
                 {
-                    saves.Add(Path.GetFileNameWithoutExtension(file));
+                    string[] files = Directory.GetFiles("Saves", "*.xml");
+                    foreach (string file in files)
+                        saves.Add(Path.GetFileNameWithoutExtension(file));
                 }
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Console.WriteLine($"Нет доступа к папке сохранений: {ex.Message}");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Ошибка чтения папки сохранений: {ex.Message}");
             }
 
             return saves;
