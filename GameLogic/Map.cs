@@ -5,33 +5,38 @@ namespace ConsoleApp46
 {
     public class Map
     {
-        private static char[,] groundTypes;
-        static public int levelWorld = 1;
-        static Random rnd = new Random();
+        private static char[,] _groundTypes;
+        private static readonly Random _random = new Random();
 
-        private const int MAP_WIDTH = 1500;
-        private const int MAP_HEIGHT = 1500;
-        private const int VIEW_WIDTH = 25;
-        private const int VIEW_HEIGHT = 25;
+        public static int LevelWorld = 1;
 
-        static public void GetMap(char[,] fullMap, int playerWorldX, int playerWorldY)
+        private const int MapWidth = 1500;
+        private const int MapHeight = 1500;
+        private const int ViewWidth = 25;
+        private const int ViewHeight = 25;
+
+        // ==================== ОСНОВНЫЕ МЕТОДЫ ====================
+
+        public static void GetMap(char[,] fullMap, int playerWorldX, int playerWorldY)
         {
             try
             {
                 if (fullMap == null)
+                {
                     throw new GameException("Карта не инициализирована", "M001", "Map", ErrorSeverity.Critical);
+                }
 
                 Console.Clear();
 
-                int startX = playerWorldX - VIEW_WIDTH / 2;
-                int startY = playerWorldY - VIEW_HEIGHT / 2;
+                int startX = playerWorldX - ViewWidth / 2;
+                int startY = playerWorldY - ViewHeight / 2;
 
-                startX = Math.Max(0, Math.Min(startX, MAP_HEIGHT - VIEW_HEIGHT));
-                startY = Math.Max(0, Math.Min(startY, MAP_WIDTH - VIEW_WIDTH));
+                startX = Math.Max(0, Math.Min(startX, MapHeight - ViewHeight));
+                startY = Math.Max(0, Math.Min(startY, MapWidth - ViewWidth));
 
-                for (int i = 0; i < VIEW_HEIGHT; i++)
+                for (int i = 0; i < ViewHeight; i++)
                 {
-                    for (int j = 0; j < VIEW_WIDTH; j++)
+                    for (int j = 0; j < ViewWidth; j++)
                     {
                         int mapX = startX + i;
                         int mapY = startY + j;
@@ -68,33 +73,37 @@ namespace ConsoleApp46
                 case 'o': Console.ForegroundColor = ConsoleColor.DarkGray; break;
                 case '★': Console.ForegroundColor = ConsoleColor.Yellow; break;
                 case 'C': Console.ForegroundColor = ConsoleColor.Yellow; break;
-                case 'B': Console.ForegroundColor = ConsoleColor.Red; break;
+                case 'K': Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                case 'W': Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                case '*': Console.ForegroundColor = ConsoleColor.Blue; break;
                 default: Console.ResetColor(); break;
             }
             Console.Write(cell + " ");
             Console.ResetColor();
         }
 
-        static public char[,] CreateFullMap()
+        public static char[,] CreateFullMap()
         {
             try
             {
-                char[,] fullMap = new char[MAP_HEIGHT, MAP_WIDTH];
-                groundTypes = new char[MAP_HEIGHT, MAP_WIDTH];
+                char[,] fullMap = new char[MapHeight, MapWidth];
+                _groundTypes = new char[MapHeight, MapWidth];
 
-                for (int i = 0; i < MAP_HEIGHT; i++)
-                    for (int j = 0; j < MAP_WIDTH; j++)
+                for (int i = 0; i < MapHeight; i++)
+                {
+                    for (int j = 0; j < MapWidth; j++)
                     {
                         fullMap[i, j] = '.';
-                        groundTypes[i, j] = '.';
+                        _groundTypes[i, j] = '.';
                     }
+                }
 
-                for (int r = 0; r < 1600; r++) GenerateRiver(fullMap);
-                for (int f = 0; f < 2000; f++) GenerateForest(fullMap);
-                for (int g = 0; g < 2700; g++)
+                for (int i = 0; i < 1600; i++) GenerateRiver(fullMap);
+                for (int i = 0; i < 2000; i++) GenerateForest(fullMap);
+                for (int i = 0; i < 2700; i++)
                 {
-                    int x = rnd.Next(20, MAP_HEIGHT - 20);
-                    int y = rnd.Next(20, MAP_WIDTH - 20);
+                    int x = _random.Next(20, MapHeight - 20);
+                    int y = _random.Next(20, MapWidth - 20);
                     CreateMountain(fullMap, x, y);
                 }
 
@@ -114,26 +123,31 @@ namespace ConsoleApp46
         {
             try
             {
-                int startX = rnd.Next(10, MAP_HEIGHT - 10);
-                int startY = rnd.Next(10, MAP_WIDTH - 10);
-                int riverLength = rnd.Next(100, 301);
+                int startX = _random.Next(10, MapHeight - 10);
+                int startY = _random.Next(10, MapWidth - 10);
+                int riverLength = _random.Next(100, 301);
                 int currentX = startX;
                 int currentY = startY;
-                int direction = rnd.Next(4);
+                int direction = _random.Next(4);
 
                 for (int step = 0; step < riverLength; step++)
                 {
-                    if (currentX >= 0 && currentX < MAP_HEIGHT && currentY >= 0 && currentY < MAP_WIDTH)
+                    if (currentX >= 0 && currentX < MapHeight && currentY >= 0 && currentY < MapWidth)
                     {
                         if (fullMap[currentX, currentY] != '^')
+                        {
                             fullMap[currentX, currentY] = '~';
+                        }
                     }
                     else
                     {
                         break;
                     }
 
-                    if (rnd.Next(100) < 30) direction = rnd.Next(4);
+                    if (_random.Next(100) < 30)
+                    {
+                        direction = _random.Next(4);
+                    }
 
                     switch (direction)
                     {
@@ -143,11 +157,11 @@ namespace ConsoleApp46
                         case 3: currentY--; break;
                     }
 
-                    if (currentX < 5 || currentX >= MAP_HEIGHT - 5 || currentY < 5 || currentY >= MAP_WIDTH - 5)
+                    if (currentX < 5 || currentX >= MapHeight - 5 || currentY < 5 || currentY >= MapWidth - 5)
                     {
                         direction = (direction + 2) % 4;
-                        currentX = Math.Max(5, Math.Min(currentX, MAP_HEIGHT - 6));
-                        currentY = Math.Max(5, Math.Min(currentY, MAP_WIDTH - 6));
+                        currentX = Math.Max(5, Math.Min(currentX, MapHeight - 6));
+                        currentY = Math.Max(5, Math.Min(currentY, MapWidth - 6));
                     }
                 }
             }
@@ -161,22 +175,28 @@ namespace ConsoleApp46
         {
             try
             {
-                int centerX = rnd.Next(10, MAP_HEIGHT - 10);
-                int centerY = rnd.Next(10, MAP_WIDTH - 10);
-                int radius = rnd.Next(5, 16);
-                int density = rnd.Next(40, 81);
+                int centerX = _random.Next(10, MapHeight - 10);
+                int centerY = _random.Next(10, MapWidth - 10);
+                int radius = _random.Next(5, 16);
+                int density = _random.Next(40, 81);
 
                 for (int x = centerX - radius; x <= centerX + radius; x++)
                 {
                     for (int y = centerY - radius; y <= centerY + radius; y++)
                     {
-                        if (x < 0 || x >= MAP_HEIGHT || y < 0 || y >= MAP_WIDTH) continue;
+                        if (x < 0 || x >= MapHeight || y < 0 || y >= MapWidth)
+                        {
+                            continue;
+                        }
+
                         double distance = Math.Sqrt(Math.Pow(x - centerX, 2) + Math.Pow(y - centerY, 2));
                         if (distance <= radius)
                         {
                             double probability = density / 100.0 * (1 - (distance / radius) * 0.5);
-                            if (rnd.NextDouble() < probability && fullMap[x, y] == '.')
+                            if (_random.NextDouble() < probability && fullMap[x, y] == '.')
+                            {
                                 fullMap[x, y] = '#';
+                            }
                         }
                     }
                 }
@@ -192,40 +212,69 @@ namespace ConsoleApp46
             try
             {
                 if (centerX < 0 || centerX >= fullMap.GetLength(0) || centerY < 0 || centerY >= fullMap.GetLength(1))
+                {
                     throw new GameException("Координаты горы вне границ карты", "M005", "Map", ErrorSeverity.Medium);
+                }
 
                 fullMap[centerX, centerY] = '^';
                 for (int dx = -1; dx <= 1; dx++)
+                {
                     for (int dy = -1; dy <= 1; dy++)
                     {
                         if (dx == 0 && dy == 0) continue;
-                        int x = centerX + dx, y = centerY + dy;
+                        int x = centerX + dx;
+                        int y = centerY + dy;
                         if (x >= 0 && x < fullMap.GetLength(0) && y >= 0 && y < fullMap.GetLength(1))
+                        {
                             fullMap[x, y] = '^';
+                        }
                     }
+                }
 
                 int[] probabilities = { 85, 70, 55, 40 };
                 for (int circle = 2; circle <= 5; circle++)
+                {
                     for (int dx = -circle; dx <= circle; dx++)
+                    {
                         for (int dy = -circle; dy <= circle; dy++)
+                        {
                             if (Math.Abs(dx) == circle || Math.Abs(dy) == circle)
                             {
-                                int x = centerX + dx, y = centerY + dy;
+                                int x = centerX + dx;
+                                int y = centerY + dy;
                                 if (x >= 0 && x < fullMap.GetLength(0) && y >= 0 && y < fullMap.GetLength(1))
-                                    if (rnd.Next(100) < probabilities[circle - 2])
+                                {
+                                    if (_random.Next(100) < probabilities[circle - 2])
+                                    {
                                         fullMap[x, y] = '^';
+                                    }
+                                }
                             }
+                        }
+                    }
+                }
 
-                if (rnd.Next(100) < 30)
+                if (_random.Next(100) < 30)
+                {
                     for (int dx = -6; dx <= 6; dx++)
+                    {
                         for (int dy = -6; dy <= 6; dy++)
+                        {
                             if (Math.Abs(dx) == 6 || Math.Abs(dy) == 6)
                             {
-                                int x = centerX + dx, y = centerY + dy;
+                                int x = centerX + dx;
+                                int y = centerY + dy;
                                 if (x >= 0 && x < fullMap.GetLength(0) && y >= 0 && y < fullMap.GetLength(1))
-                                    if (rnd.Next(100) < 25)
+                                {
+                                    if (_random.Next(100) < 25)
+                                    {
                                         fullMap[x, y] = '^';
+                                    }
+                                }
                             }
+                        }
+                    }
+                }
             }
             catch (GameException ex)
             {
@@ -240,11 +289,12 @@ namespace ConsoleApp46
                 int cavePortals = 0;
                 while (cavePortals < 800)
                 {
-                    int x = rnd.Next(5, MAP_HEIGHT - 5), y = rnd.Next(5, MAP_WIDTH - 5);
+                    int x = _random.Next(5, MapHeight - 5);
+                    int y = _random.Next(5, MapWidth - 5);
                     if (fullMap[x, y] == '.' && HasNearby(fullMap, x, y, '^'))
                     {
                         fullMap[x, y] = 'O';
-                        groundTypes[x, y] = 'O';
+                        _groundTypes[x, y] = 'O';
                         cavePortals++;
                     }
                 }
@@ -252,24 +302,26 @@ namespace ConsoleApp46
                 int titanicPortals = 0;
                 while (titanicPortals < 400)
                 {
-                    int x = rnd.Next(5, MAP_HEIGHT - 5), y = rnd.Next(5, MAP_WIDTH - 5);
+                    int x = _random.Next(5, MapHeight - 5);
+                    int y = _random.Next(5, MapWidth - 5);
                     if (fullMap[x, y] == '.' && HasNearby(fullMap, x, y, '~'))
                     {
                         fullMap[x, y] = 'T';
-                        groundTypes[x, y] = 'T';
+                        _groundTypes[x, y] = 'T';
                         titanicPortals++;
                     }
                 }
 
-                int hutPortals = 0;
-                while (hutPortals < 300)
+                int housePortals = 0;
+                while (housePortals < 300)
                 {
-                    int x = rnd.Next(5, MAP_HEIGHT - 5), y = rnd.Next(5, MAP_WIDTH - 5);
+                    int x = _random.Next(5, MapHeight - 5);
+                    int y = _random.Next(5, MapWidth - 5);
                     if (fullMap[x, y] == '.' && HasNearby(fullMap, x, y, '#'))
                     {
                         fullMap[x, y] = 'F';
-                        groundTypes[x, y] = 'F';
-                        hutPortals++;
+                        _groundTypes[x, y] = 'F';
+                        housePortals++;
                     }
                 }
             }
@@ -282,13 +334,18 @@ namespace ConsoleApp46
         private static bool HasNearby(char[,] fullMap, int x, int y, char target)
         {
             for (int dx = -1; dx <= 1; dx++)
+            {
                 for (int dy = -1; dy <= 1; dy++)
                 {
                     if (dx == 0 && dy == 0) continue;
-                    int nx = x + dx, ny = y + dy;
-                    if (nx >= 0 && nx < MAP_HEIGHT && ny >= 0 && ny < MAP_WIDTH)
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx >= 0 && nx < MapHeight && ny >= 0 && ny < MapWidth)
+                    {
                         if (fullMap[nx, ny] == target) return true;
+                    }
                 }
+            }
             return false;
         }
 
@@ -296,20 +353,39 @@ namespace ConsoleApp46
         {
             try
             {
-                for (int i = 0; i < MAP_HEIGHT; i++)
-                    for (int j = 0; j < MAP_WIDTH; j++)
-                        if (rnd.Next(100) < 3 && fullMap[i, j] == '.')
+                for (int i = 0; i < MapHeight; i++)
+                {
+                    for (int j = 0; j < MapWidth; j++)
+                    {
+                        if (_random.Next(100) < 3 && fullMap[i, j] == '.')
+                        {
                             fullMap[i, j] = '&';
+                        }
+                    }
+                }
 
-                for (int i = 0; i < MAP_HEIGHT; i++)
-                    for (int j = 0; j < MAP_WIDTH; j++)
-                        if (rnd.Next(100) < 3 && fullMap[i, j] == '.')
+                for (int i = 0; i < MapHeight; i++)
+                {
+                    for (int j = 0; j < MapWidth; j++)
+                    {
+                        if (_random.Next(100) < 3 && fullMap[i, j] == '.')
+                        {
                             fullMap[i, j] = 'H';
+                        }
+                    }
+                }
 
-                for (int i = 0; i < MAP_HEIGHT; i++)
-                    for (int j = 0; j < MAP_WIDTH; j++)
-                        if (rnd.Next(100) >= 10 && rnd.Next(100) < 13 && fullMap[i, j] == '.')
+                for (int i = 0; i < MapHeight; i++)
+                {
+                    for (int j = 0; j < MapWidth; j++)
+                    {
+                        int count = _random.Next(100);
+                        if (count >= 10 && count < 13 && fullMap[i, j] == '.')
+                        {
                             fullMap[i, j] = '%';
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -322,17 +398,25 @@ namespace ConsoleApp46
             try
             {
                 if (fullMap == null)
+                {
                     throw new GameException("Карта не инициализирована", "M006", "Map", ErrorSeverity.Critical);
+                }
 
-                int startX = playerX - VIEW_WIDTH / 2;
-                int startY = playerY - VIEW_HEIGHT / 2;
-                startX = Math.Max(0, Math.Min(startX, MAP_HEIGHT - VIEW_HEIGHT));
-                startY = Math.Max(0, Math.Min(startY, MAP_WIDTH - VIEW_WIDTH));
+                int startX = playerX - ViewWidth / 2;
+                int startY = playerY - ViewHeight / 2;
+                startX = Math.Max(0, Math.Min(startX, MapHeight - ViewHeight));
+                startY = Math.Max(0, Math.Min(startY, MapWidth - ViewWidth));
 
-                for (int i = 0; i < VIEW_HEIGHT; i++)
-                    for (int j = 0; j < VIEW_WIDTH; j++)
+                for (int i = 0; i < ViewHeight; i++)
+                {
+                    for (int j = 0; j < ViewWidth; j++)
+                    {
                         if (fullMap[startX + i, startY + j] == '&')
+                        {
                             return true;
+                        }
+                    }
+                }
                 return false;
             }
             catch (GameException ex)
@@ -345,9 +429,15 @@ namespace ConsoleApp46
         public static bool IsPortalOnMap(char[,] fullMap)
         {
             for (int i = 0; i < fullMap.GetLength(0); i++)
+            {
                 for (int j = 0; j < fullMap.GetLength(1); j++)
+                {
                     if (fullMap[i, j] == '0')
+                    {
                         return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -358,26 +448,29 @@ namespace ConsoleApp46
                 if (!HasEnemiesInView(fullMap, playerX, playerY) && !IsPortalOnMap(fullMap))
                 {
                     for (int dx = -1; dx <= 1; dx++)
+                    {
                         for (int dy = -1; dy <= 1; dy++)
                         {
                             if (dx == 0 && dy == 0) continue;
-                            int portalX = playerX + dx, portalY = playerY + dy;
+                            int portalX = playerX + dx;
+                            int portalY = playerY + dy;
                             if (portalX >= 5 && portalX < fullMap.GetLength(0) - 5 &&
                                 portalY >= 5 && portalY < fullMap.GetLength(1) - 5 &&
                                 fullMap[portalX, portalY] == '.')
                             {
                                 fullMap[portalX, portalY] = '0';
-                                groundTypes[portalX, portalY] = '.';
-                                Console.SetCursorPosition(0, 28);
+                                _groundTypes[portalX, portalY] = '.';
+                                Console.SetCursorPosition(0, 30);
                                 Console.ForegroundColor = ConsoleColor.Yellow;
                                 Console.WriteLine("⭐ ПОРТАЛ ПОЯВИЛСЯ РЯДОМ! ⭐");
                                 Console.ResetColor();
                                 System.Threading.Thread.Sleep(2000);
-                                Console.SetCursorPosition(0, 28);
-                                Console.WriteLine("                                          ");
+                                Console.SetCursorPosition(0, 30);
+                                Console.WriteLine(new string(' ', 60));
                                 return;
                             }
                         }
+                    }
                 }
             }
             catch (GameException ex)
@@ -400,7 +493,6 @@ namespace ConsoleApp46
                 }
             }
 
-            // Стены по краям
             for (int i = 0; i < 25; i++)
             {
                 caveMap[0, i] = '#';
@@ -409,21 +501,17 @@ namespace ConsoleApp46
                 caveMap[i, 24] = '#';
             }
 
-            // Целевые места для камней
             caveMap[5, 5] = 'O';
             caveMap[5, 19] = 'O';
             caveMap[19, 5] = 'O';
             caveMap[19, 19] = 'O';
 
-            // Камни
             caveMap[3, 12] = 'o';
             caveMap[12, 3] = 'o';
             caveMap[12, 21] = 'o';
             caveMap[21, 12] = 'o';
 
-            // Выход (появится после решения)
             caveMap[12, 12] = ' ';
-
             return caveMap;
         }
 
@@ -491,7 +579,8 @@ namespace ConsoleApp46
             Console.WriteLine("Подойдите к камню (o) и нажмите стрелку в его сторону, чтобы толкнуть его");
             Console.WriteLine("Камень двигается на 1 клетку в направлении движения");
             Console.WriteLine("Поставьте все камни на желтые цели (O)");
-            Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.coin}");
+            Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.Coins}");
+            Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
         }
 
         public static bool CheckCavePuzzleSolved(char[,] caveMap)
@@ -508,24 +597,17 @@ namespace ConsoleApp46
             int stoneX = playerX + dx;
             int stoneY = playerY + dy;
 
-            if (stoneX < 0 || stoneX >= 25 || stoneY < 0 || stoneY >= 25)
-                return;
-
-            if (caveMap[stoneX, stoneY] != 'o')
-                return;
+            if (stoneX < 0 || stoneX >= 25 || stoneY < 0 || stoneY >= 25) return;
+            if (caveMap[stoneX, stoneY] != 'o') return;
 
             int newX = stoneX + dx;
             int newY = stoneY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
 
             char targetCell = caveMap[newX, newY];
+            if (targetCell == '#' || targetCell == 'o') return;
 
-            if (targetCell == '#' || targetCell == 'o')
-                return;
-
-            bool wasTarget = (targetCell == 'O');
             bool currentWasTarget = (caveMap[stoneX, stoneY] == 'O');
 
             if (currentWasTarget)
@@ -559,24 +641,24 @@ namespace ConsoleApp46
             int newX = playerX + dx;
             int newY = playerY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
 
             char cell = caveMap[newX, newY];
 
             if (cell == '★' && puzzleSolved)
             {
                 inCave = false;
-                Console.SetCursorPosition(0, 28);
+                Console.SetCursorPosition(0, 30);
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("⛰️ ВЫ ВЫШЛИ ИЗ ПЕЩЕРЫ! ⛰️");
                 Console.ResetColor();
                 System.Threading.Thread.Sleep(1500);
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
                 return;
             }
 
-            if (cell == '#')
-                return;
+            if (cell == '#') return;
 
             if (cell == 'o')
             {
@@ -587,16 +669,19 @@ namespace ConsoleApp46
                     puzzleSolved = true;
                     caveMap[12, 12] = '★';
 
-                    Console.SetCursorPosition(0, 28);
+                    Console.SetCursorPosition(0, 30);
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine("✨ ЗАГАДКА РЕШЕНА! Выход открыт в центре пещеры! ✨");
                     Console.ResetColor();
                     System.Threading.Thread.Sleep(2000);
 
-                    hero.coin += 200;
+                    hero.Coins += 200;
                     hero.MaxHP += 20;
                     hero.HP += 20;
                     if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
+
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
                 }
                 return;
             }
@@ -621,16 +706,19 @@ namespace ConsoleApp46
                 puzzleSolved = true;
                 caveMap[12, 12] = '★';
 
-                Console.SetCursorPosition(0, 28);
+                Console.SetCursorPosition(0, 30);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("✨ ЗАГАДКА РЕШЕНА! Выход открыт в центре пещеры! ✨");
                 Console.ResetColor();
                 System.Threading.Thread.Sleep(2000);
 
-                hero.coin += 200;
+                hero.Coins += 200;
                 hero.MaxHP += 20;
                 hero.HP += 20;
                 if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
+
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
             }
         }
 
@@ -644,119 +732,331 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < 25; j++)
                 {
-                    titanicMap[i, j] = '.';
+                    titanicMap[i, j] = '~';
                 }
             }
 
-            titanicMap[12, 13] = 'T';
+            titanicMap[12, 23] = 'T';
+
+            int seaweedCount = _random.Next(30, 50);
+            for (int i = 0; i < seaweedCount; i++)
+            {
+                int x = _random.Next(1, 24);
+                int y = _random.Next(1, 24);
+                if (titanicMap[x, y] == '~' && !(x == 12 && y == 23))
+                {
+                    titanicMap[x, y] = 'W';
+                }
+            }
+
+            int fishCount = _random.Next(8, 15);
+            for (int i = 0; i < fishCount; i++)
+            {
+                int x = _random.Next(1, 24);
+                int y = _random.Next(1, 24);
+                if (titanicMap[x, y] == '~' && !(x == 12 && y == 23))
+                {
+                    titanicMap[x, y] = 'F';
+                }
+            }
+
+            int currentCount = _random.Next(40, 60);
+            for (int i = 0; i < currentCount; i++)
+            {
+                int x = _random.Next(1, 24);
+                int y = _random.Next(1, 24);
+                if (titanicMap[x, y] == '~' && !(x == 12 && y == 23))
+                {
+                    titanicMap[x, y] = '*';
+                }
+            }
+
             return titanicMap;
         }
 
-        public static void MoveInTitanic(ref int titanicPlayerX, ref int titanicPlayerY, int dx, int dy, char[,] titanicMap, ref bool inTitanic, Person hero)
+        public static void RenderTitanicMap(char[,] titanicMap, Person hero, int fishCount)
         {
-            int newX = titanicPlayerX + dx;
-            int newY = titanicPlayerY + dy;
-
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                return;
-
-            if (titanicMap[newX, newY] == 'T')
-            {
-                inTitanic = false;
-                Console.SetCursorPosition(0, 28);
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("🚢 ВЫ ВЫШЛИ ИЗ ТИТАНИКА! 🚢");
-                Console.ResetColor();
-                System.Threading.Thread.Sleep(1500);
-                return;
-            }
-
-            int damage = 5;
-            hero.HP -= damage;
-
-            Console.SetCursorPosition(0, 29);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"❄️ Холодная вода! Вы потеряли {damage} здоровья! ❄️");
-            Console.ResetColor();
-
-            if (hero.HP <= 0)
-            {
-                Console.Clear();
-                Console.WriteLine("❄️ ВЫ ЗАМЕРЗЛИ В ЛЕДЯНОЙ ВОДЕ! ❄️");
-                Console.WriteLine("Ваше тело ушло на дно океана...");
-                Console.ReadKey();
-                return;
-            }
-
-            System.Threading.Thread.Sleep(800);
-
-            titanicMap[titanicPlayerX, titanicPlayerY] = '.';
-            titanicPlayerX = newX;
-            titanicPlayerY = newY;
-            titanicMap[titanicPlayerX, titanicPlayerY] = '@';
-        }
-
-        // ==================== ЛОКАЦИЯ ДОМИК БАБЫ ЯГИ ====================
-
-        public static char[,] CreateHutMap()
-        {
-            char[,] hutMap = new char[25, 25];
+            Console.Clear();
+            Console.WriteLine("╔══════════════════════════════════════════════════════════╗");
+            Console.WriteLine("║                     ЗАТОНУВШИЙ ТИТАНИК                   ║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════╣");
+            Console.WriteLine("║  ~ Вода (отнимает 1 HP за шаг)                         ║");
+            Console.WriteLine("║  F Рыба - можно поймать                                ║");
+            Console.WriteLine("║  W Водоросли - нельзя пройти                           ║");
+            Console.WriteLine("║  * Подводное течение - уносит в случайном направлении   ║");
+            Console.WriteLine("║  T Выход из Титаника                                   ║");
+            Console.WriteLine($"║  🎣 Поймано рыбы: {fishCount}                             ║");
+            Console.WriteLine("╚══════════════════════════════════════════════════════════╝");
+            Console.WriteLine();
 
             for (int i = 0; i < 25; i++)
             {
                 for (int j = 0; j < 25; j++)
                 {
-                    hutMap[i, j] = '.';
+                    char cell = titanicMap[i, j];
+
+                    if (cell == '@')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("@ ");
+                        Console.ResetColor();
+                    }
+                    else if (cell == 'T')
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("T ");
+                        Console.ResetColor();
+                    }
+                    else if (cell == 'W')
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.Write("W ");
+                        Console.ResetColor();
+                    }
+                    else if (cell == 'F')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("F ");
+                        Console.ResetColor();
+                    }
+                    else if (cell == '*')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write("* ");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.Write("~ ");
+                    }
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.Coins}");
+            Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
+        }
+
+        private static bool ApplyCurrent(ref int playerX, ref int playerY, char[,] titanicMap)
+        {
+            int direction = _random.Next(4);
+            int dx = 0, dy = 0;
+
+            switch (direction)
+            {
+                case 0: dx = -1; break;
+                case 1: dy = 1; break;
+                case 2: dx = 1; break;
+                case 3: dy = -1; break;
+            }
+
+            int newX = playerX;
+            int newY = playerY;
+            int steps = _random.Next(2, 5);
+
+            for (int step = 0; step < steps; step++)
+            {
+                int nextX = newX + dx;
+                int nextY = newY + dy;
+
+                if (nextX < 0 || nextX >= 25 || nextY < 0 || nextY >= 25) break;
+                if (titanicMap[nextX, nextY] == 'W' || titanicMap[nextX, nextY] == 'T') break;
+
+                newX = nextX;
+                newY = nextY;
+            }
+
+            if (newX != playerX || newY != playerY)
+            {
+                playerX = newX;
+                playerY = newY;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void MoveInTitanic(ref int titanicPlayerX, ref int titanicPlayerY, int dx, int dy,
+            char[,] titanicMap, ref bool inTitanic, Person hero, ref int fishCount, ref bool hasFish)
+        {
+            int newX = titanicPlayerX + dx;
+            int newY = titanicPlayerY + dy;
+
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
+
+            char cell = titanicMap[newX, newY];
+
+            if (cell == 'T')
+            {
+                inTitanic = false;
+                hasFish = (fishCount > 0);
+                Console.SetCursorPosition(0, 30);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"🚢 ВЫ ВЫШЛИ ИЗ ТИТАНИКА! Рыба осталась в инвентаре: {fishCount} 🚢");
+                Console.ResetColor();
+                System.Threading.Thread.Sleep(2000);
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
+                return;
+            }
+
+            if (cell == 'W')
+            {
+                Console.SetCursorPosition(0, 30);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("🌿 Вы не можете пройти через водоросли! 🌿");
+                Console.ResetColor();
+                System.Threading.Thread.Sleep(800);
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
+                return;
+            }
+
+            if (cell == 'F')
+            {
+                fishCount++;
+                titanicMap[newX, newY] = '~';
+                hasFish = (fishCount > 0);
+                Console.SetCursorPosition(0, 30);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"🐟 Вы поймали рыбу! Всего рыбы: {fishCount} 🐟");
+                Console.ResetColor();
+                System.Threading.Thread.Sleep(800);
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
+            }
+
+            int damage = 1;
+            hero.HP -= damage;
+
+            Console.SetCursorPosition(0, 30);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"🌊 Холодная вода! Вы потеряли {damage} здоровья! 🌊");
+            Console.ResetColor();
+            System.Threading.Thread.Sleep(500);
+            Console.SetCursorPosition(0, 30);
+            Console.WriteLine(new string(' ', 60));
+
+            if (hero.HP <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("🌊 ВЫ УТОНУЛИ В ЛЕДЯНОЙ ВОДЕ! 🌊");
+                Console.WriteLine("Ваше тело ушло на дно океана...");
+                Console.ReadKey();
+                return;
+            }
+
+            titanicMap[titanicPlayerX, titanicPlayerY] = '~';
+            titanicPlayerX = newX;
+            titanicPlayerY = newY;
+
+            char currentCell = titanicMap[titanicPlayerX, titanicPlayerY];
+
+            if (currentCell == '*')
+            {
+                Console.SetCursorPosition(0, 30);
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("🌊 Вас подхватило подводное течение! 🌊");
+                Console.ResetColor();
+
+                int oldX = titanicPlayerX;
+                int oldY = titanicPlayerY;
+
+                bool moved = ApplyCurrent(ref titanicPlayerX, ref titanicPlayerY, titanicMap);
+
+                if (moved)
+                {
+                    titanicMap[oldX, oldY] = '~';
+                    titanicMap[titanicPlayerX, titanicPlayerY] = '@';
+                    System.Threading.Thread.Sleep(1500);
+                }
+                else
+                {
+                    titanicMap[titanicPlayerX, titanicPlayerY] = '@';
+                }
+
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
+            }
+            else
+            {
+                titanicMap[titanicPlayerX, titanicPlayerY] = '@';
+            }
+
+            System.Threading.Thread.Sleep(300);
+        }
+
+        // ==================== ЛОКАЦИЯ ДОМИК ====================
+
+        public static char[,] CreateHouseMap()
+        {
+            char[,] houseMap = new char[25, 25];
+
+            for (int i = 0; i < 25; i++)
+            {
+                for (int j = 0; j < 25; j++)
+                {
+                    houseMap[i, j] = '.';
                 }
             }
 
             // Стены по краям
             for (int i = 0; i < 25; i++)
             {
-                hutMap[0, i] = '#';
-                hutMap[24, i] = '#';
-                hutMap[i, 0] = '#';
-                hutMap[i, 24] = '#';
+                houseMap[0, i] = '#';
+                houseMap[24, i] = '#';
+                houseMap[i, 0] = '#';
+                houseMap[i, 24] = '#';
             }
 
-            // Домик Бабы Яги (внутренние стены)
+            // Комната (декоративные стены, но кот ходит везде)
             for (int i = 8; i <= 16; i++)
             {
                 for (int j = 8; j <= 16; j++)
                 {
                     if (i == 8 || i == 16 || j == 8 || j == 16)
                     {
-                        hutMap[i, j] = '#';
+                        houseMap[i, j] = '#';
                     }
                 }
             }
 
-            // Вход в домик
-            hutMap[12, 8] = '.';
+            // Вход в комнату
+            houseMap[12, 8] = '.';
 
-            // Сундук с артефактом
-            hutMap[10, 10] = 'C';
+            // Кот (ходит по всей карте, не только в комнате)
+            houseMap[14, 14] = 'K';
 
-            // Противник (Баба Яга)
-            hutMap[14, 14] = 'B';
+            // Выход из домика
+            houseMap[12, 20] = 'F';
 
-            // Выход из локации
-            hutMap[12, 20] = 'F';
-
-            return hutMap;
+            return houseMap;
         }
 
-        public static void RenderHutMap(char[,] hutMap, Person hero, bool hasArtifact)
+        public static void RenderHouseMap(char[,] houseMap, Person hero, bool hasFish, bool hasReward, bool catCatched)
         {
             Console.Clear();
             Console.WriteLine("╔══════════════════════════════════════════════════════════╗");
-            Console.WriteLine("║                  ДОМИК БАБЫ ЯГИ                          ║");
+            Console.WriteLine("║                       ДОМИК                             ║");
             Console.WriteLine("╠══════════════════════════════════════════════════════════╣");
-            Console.WriteLine("║  Баба Яга (B) двигается по полю!                        ║");
-            Console.WriteLine("║  Найдите сундук (C) и получите артефакт                 ║");
-            if (hasArtifact)
+            Console.WriteLine("║  Кот (K) бегает по всему домику!                       ║");
+            if (!catCatched)
             {
-                Console.WriteLine("║  ✨ У вас есть артефакт! Поймайте Бабу Ягу (B) ✨        ║");
+                Console.WriteLine("║  Подойдите к коту, чтобы поймать его!                 ║");
+                Console.WriteLine("║  Кот убегает, если вы подходите без рыбы!            ║");
+            }
+            else
+            {
+                Console.WriteLine("║  ✨ Кот пойман! Можете выходить через F ✨             ║");
+            }
+            if (!hasFish && !catCatched)
+            {
+                Console.WriteLine("║  🐟 Вам нужна рыба, чтобы поймать кота!                ║");
+                Console.WriteLine("║     Поймайте рыбу в Титанике!                         ║");
+            }
+            else if (hasFish && !catCatched)
+            {
+                Console.WriteLine("║  🐟 У вас есть рыба! Подойдите к коту (K)!             ║");
             }
             Console.WriteLine("╚══════════════════════════════════════════════════════════╝");
             Console.WriteLine();
@@ -765,7 +1065,7 @@ namespace ConsoleApp46
             {
                 for (int j = 0; j < 25; j++)
                 {
-                    char cell = hutMap[i, j];
+                    char cell = houseMap[i, j];
 
                     if (cell == '@')
                     {
@@ -779,16 +1079,10 @@ namespace ConsoleApp46
                         Console.Write("# ");
                         Console.ResetColor();
                     }
-                    else if (cell == 'C')
+                    else if (cell == 'K')
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write("C ");
-                        Console.ResetColor();
-                    }
-                    else if (cell == 'B')
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.Write("B ");
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        Console.Write("K ");
                         Console.ResetColor();
                     }
                     else if (cell == 'F')
@@ -806,223 +1100,236 @@ namespace ConsoleApp46
             }
 
             Console.WriteLine("\n=== ПРАВИЛА ===");
-            if (!hasArtifact)
+            if (!catCatched)
             {
-                Console.WriteLine("🔍 Найдите сундук (C) внутри домика!");
-                Console.WriteLine("👻 Баба Яга двигается по полю и наносит урон при столкновении!");
+                Console.WriteLine("🐱 Кот бегает по всему домику!");
+                if (!hasFish)
+                {
+                    Console.WriteLine("🐟 Вам нужно поймать рыбу в Титанике, чтобы поймать кота!");
+                    Console.WriteLine("🐱 Подойдите к коту - он убежит, если у вас нет рыбы!");
+                }
+                else
+                {
+                    Console.WriteLine("🐟 У вас есть рыба! Подойдите к коту (K), чтобы поймать его!");
+                }
             }
             else
             {
-                Console.WriteLine("⚔️ Поймайте Бабу Ягу (B), чтобы использовать артефакт!");
+                Console.WriteLine("✨ Кот пойман! Можете выходить через F");
             }
-            Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.coin}");
+            Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.Coins} | 🐟 Рыба: {(hasFish ? "есть" : "нет")}");
+            Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
         }
 
-        // Метод для движения Бабы Яги
-        public static void MoveBabaYaga(ref char[,] hutMap, ref int babaX, ref int babaY, int playerX, int playerY, Person hero, ref bool inHut)
+        private static void MoveCat(ref char[,] houseMap, ref int catX, ref int catY)
         {
-            if (babaX == -1 && babaY == -1) return; // Баба Яга побеждена
+            if (catX == -1 && catY == -1) return;
 
             int[] dx = { -1, 1, 0, 0 };
             int[] dy = { 0, 0, -1, 1 };
 
-            // Перемешиваем направления для случайности
             List<int> directions = new List<int> { 0, 1, 2, 3 };
             for (int i = 0; i < directions.Count; i++)
             {
-                int randomIndex = rnd.Next(i, directions.Count);
+                int randomIndex = _random.Next(i, directions.Count);
                 int temp = directions[i];
                 directions[i] = directions[randomIndex];
                 directions[randomIndex] = temp;
             }
 
-            // Пытаемся найти направление, где Баба Яга может двигаться
             bool moved = false;
             foreach (int dir in directions)
             {
-                int newX = babaX + dx[dir];
-                int newY = babaY + dy[dir];
+                int newX = catX + dx[dir];
+                int newY = catY + dy[dir];
 
-                if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                    continue;
+                if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) continue;
 
-                char targetCell = hutMap[newX, newY];
+                char targetCell = houseMap[newX, newY];
 
-                // Если Баба Яга наступает на игрока
-                if (targetCell == '@')
+                // Кот может ходить по всей карте (по пустым клеткам и по клеткам с игроком)
+                if (targetCell == '.' || targetCell == '@')
                 {
-                    int damage = 10;
-                    hero.HP -= damage;
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"💀 Баба Яга ударила вас! Вы потеряли {damage} здоровья! 💀");
-                    Console.ResetColor();
-                    System.Threading.Thread.Sleep(1000);
-
-                    if (hero.HP <= 0)
-                    {
-                        inHut = false;
-                        return;
-                    }
-                    // Баба Яга не занимает клетку игрока, просто наносит урон
-                    return;
-                }
-
-                // Баба Яга может ходить по пустым клеткам
-                if (targetCell == '.')
-                {
-                    hutMap[babaX, babaY] = '.';
-                    babaX = newX;
-                    babaY = newY;
-                    hutMap[babaX, babaY] = 'B';
+                    houseMap[catX, catY] = '.';
+                    catX = newX;
+                    catY = newY;
+                    houseMap[catX, catY] = 'K';
                     moved = true;
                     break;
                 }
             }
 
-            // 30% шанс, что Баба Яга сделает дополнительный шаг
-            if (moved && rnd.Next(100) < 30)
+            // 30% шанс, что кот сделает дополнительный шаг
+            if (moved && _random.Next(100) < 30)
             {
                 foreach (int dir in directions)
                 {
-                    int newX = babaX + dx[dir];
-                    int newY = babaY + dy[dir];
+                    int newX = catX + dx[dir];
+                    int newY = catY + dy[dir];
 
-                    if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                        continue;
+                    if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) continue;
 
-                    char targetCell = hutMap[newX, newY];
+                    char targetCell = houseMap[newX, newY];
 
-                    if (targetCell == '@')
+                    if (targetCell == '.' || targetCell == '@')
                     {
-                        int damage = 10;
-                        hero.HP -= damage;
-                        Console.SetCursorPosition(0, 28);
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"💀 Баба Яга ударила вас! Вы потеряли {damage} здоровья! 💀");
-                        Console.ResetColor();
-                        System.Threading.Thread.Sleep(1000);
-
-                        if (hero.HP <= 0)
-                        {
-                            inHut = false;
-                            return;
-                        }
-                        return;
-                    }
-
-                    if (targetCell == '.')
-                    {
-                        hutMap[babaX, babaY] = '.';
-                        babaX = newX;
-                        babaY = newY;
-                        hutMap[babaX, babaY] = 'B';
+                        houseMap[catX, catY] = '.';
+                        catX = newX;
+                        catY = newY;
+                        houseMap[catX, catY] = 'K';
                         break;
                     }
                 }
             }
         }
 
-        public static void MoveInHut(ref int hutPlayerX, ref int hutPlayerY, int dx, int dy,
-            ref char[,] hutMap, ref bool inHut, ref bool hasArtifact, ref int babaX, ref int babaY, Person hero)
+        public static void MoveInHouse(ref int housePlayerX, ref int housePlayerY, int dx, int dy,
+    ref char[,] houseMap, ref bool inHouse, ref bool hasFish, ref bool hasReward,
+    ref int catX, ref int catY, ref bool catCatched, ref int fishCount, Person hero)
         {
-            int newX = hutPlayerX + dx;
-            int newY = hutPlayerY + dy;
+            int newX = housePlayerX + dx;
+            int newY = housePlayerY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
-                return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
 
-            char cell = hutMap[newX, newY];
+            char cell = houseMap[newX, newY];
 
             // Выход из домика
             if (cell == 'F')
             {
-                inHut = false;
-                hasArtifact = false;
-                Console.SetCursorPosition(0, 28);
+                inHouse = false;
+                Console.SetCursorPosition(0, 30);
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("🏚️ ВЫ ВЫШЛИ ИЗ ДОМИКА! 🏚️");
+                Console.WriteLine("🏠 ВЫ ВЫШЛИ ИЗ ДОМИКА! 🏠");
                 Console.ResetColor();
                 System.Threading.Thread.Sleep(1500);
+                Console.SetCursorPosition(0, 30);
+                Console.WriteLine(new string(' ', 60));
                 return;
             }
 
             // Стены
-            if (cell == '#')
-                return;
+            if (cell == '#') return;
 
-            // Сундук
-            if (cell == 'C' && !hasArtifact)
+            // Если кот еще не пойман и игрок наступает на кота
+            if (cell == 'K' && !catCatched)
             {
-                hasArtifact = true;
-                hutMap[newX, newY] = '.';
-                Console.SetCursorPosition(0, 28);
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("✨ ВЫ НАШЛИ АРТЕФАКТ! Теперь можете поймать Бабу Ягу! ✨");
-                Console.ResetColor();
-                System.Threading.Thread.Sleep(2000);
-
-                hero.coin += 100;
-
-                hutMap[hutPlayerX, hutPlayerY] = '.';
-                hutPlayerX = newX;
-                hutPlayerY = newY;
-                hutMap[hutPlayerX, hutPlayerY] = '@';
-
-                // Баба Яга двигается после взятия артефакта
-                MoveBabaYaga(ref hutMap, ref babaX, ref babaY, hutPlayerX, hutPlayerY, hero, ref inHut);
-                return;
-            }
-
-            // Баба Яга
-            if (cell == 'B')
-            {
-                if (hasArtifact)
+                if (hasFish)
                 {
-                    hutMap[newX, newY] = '.';
-                    Console.SetCursorPosition(0, 28);
+                    // Поймали кота
+                    fishCount--;
+                    hasFish = (fishCount > 0);
+                    catCatched = true;
+                    hasReward = true;
+
+                    houseMap[catX, catY] = '.';
+                    catX = -1;
+                    catY = -1;
+
+                    Console.SetCursorPosition(0, 30);
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine("⚔️ ВЫ ПОБЕДИЛИ БАБУ ЯГУ! Артефакт сработал! ⚔️");
+                    Console.WriteLine("🐱 ВЫ ПОЙМАЛИ КОТА! Он был голодный и съел вашу рыбу! 🐱");
+                    Console.ResetColor();
+                    System.Threading.Thread.Sleep(1500);
+
+                    Console.SetCursorPosition(0, 31);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("✨ Кот благодарен! Вы получили 300 монет и +30 к здоровью! ✨");
                     Console.ResetColor();
                     System.Threading.Thread.Sleep(2000);
 
-                    hero.coin += 300;
+                    hero.Coins += 300;
                     hero.MaxHP += 30;
                     hero.HP += 30;
                     if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
 
-                    hutMap[hutPlayerX, hutPlayerY] = '.';
-                    hutPlayerX = newX;
-                    hutPlayerY = newY;
-                    hutMap[hutPlayerX, hutPlayerY] = '@';
+                    // Перемещаем игрока на место кота
+                    houseMap[housePlayerX, housePlayerY] = '.';
+                    housePlayerX = newX;
+                    housePlayerY = newY;
+                    houseMap[housePlayerX, housePlayerY] = '@';
 
-                    // Баба Яга побеждена, удаляем её
-                    babaX = -1;
-                    babaY = -1;
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 31);
+                    Console.WriteLine(new string(' ', 60));
+                    return;
                 }
                 else
                 {
-                    // Баба Яга убегает
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("👻 Баба Яга убежала! Вам нужно найти артефакт! 👻");
-                    Console.ResetColor();
-                    System.Threading.Thread.Sleep(1000);
+                    // Кот убегает на случайное место по всей карте
+                    int oldCatX = catX;
+                    int oldCatY = catY;
 
-                    // Игрок не двигается, а Баба Яга двигается
-                    MoveBabaYaga(ref hutMap, ref babaX, ref babaY, hutPlayerX, hutPlayerY, hero, ref inHut);
+                    int newCatX, newCatY;
+                    do
+                    {
+                        newCatX = _random.Next(1, 24);
+                        newCatY = _random.Next(1, 24);
+                    }
+                    while (houseMap[newCatX, newCatY] != '.' || (newCatX == housePlayerX && newCatY == housePlayerY));
+
+                    houseMap[oldCatX, oldCatY] = '.';
+                    catX = newCatX;
+                    catY = newCatY;
+                    houseMap[catX, catY] = 'K';
+
+                    Console.SetCursorPosition(0, 30);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("🐱 Кот убежал! Вам нужна рыба, чтобы его поймать! 🐱");
+                    Console.ResetColor();
+                    System.Threading.Thread.Sleep(1500);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
+
+                    // Игрок не двигается, так как кот убежал
+                    return;
                 }
-                return;
             }
 
-            // Обычное движение игрока
-            hutMap[hutPlayerX, hutPlayerY] = '.';
-            hutPlayerX = newX;
-            hutPlayerY = newY;
-            hutMap[hutPlayerX, hutPlayerY] = '@';
+            // Обычное движение игрока (если не наступил на кота)
+            houseMap[housePlayerX, housePlayerY] = '.';
+            housePlayerX = newX;
+            housePlayerY = newY;
+            houseMap[housePlayerX, housePlayerY] = '@';
 
-            // Баба Яга двигается после каждого шага игрока
-            MoveBabaYaga(ref hutMap, ref babaX, ref babaY, hutPlayerX, hutPlayerY, hero, ref inHut);
+            // Кот двигается только если еще не пойман
+            if (!catCatched)
+            {
+                MoveCat(ref houseMap, ref catX, ref catY);
+            }
+        }
+
+        // ==================== ИНВЕНТАРЬ ====================
+
+        public static void ShowInventory(Person hero, int fishCount, bool hasArtifact)
+        {
+            Console.Clear();
+            Console.WriteLine("╔══════════════════════════════════════════════════════════╗");
+            Console.WriteLine("║                      ИНВЕНТАРЬ                          ║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════╣");
+            Console.WriteLine($"║  Имя героя: {hero.Name}                                  ║");
+            Console.WriteLine($"║  Здоровье: {hero.HP}/{hero.MaxHP}                        ║");
+            Console.WriteLine($"║  Сила: {hero.Strength}                                  ║");
+            Console.WriteLine($"║  Монет: {hero.Coins}                                    ║");
+            Console.WriteLine($"║  🐟 Рыба: {fishCount} шт.                               ║");
+            Console.WriteLine("╠══════════════════════════════════════════════════════════╣");
+            Console.WriteLine("║  Предметы:                                              ║");
+            if (hasArtifact)
+            {
+                Console.WriteLine("║  ✨ Артефакт (для победы над Бабой Ягой)             ║");
+            }
+            else
+            {
+                Console.WriteLine("║  ❌ Артефакт не найден                                ║");
+            }
+            if (fishCount > 0)
+            {
+                Console.WriteLine($"║  🐟 Рыба x{fishCount} (можно использовать в домике)      ║");
+            }
+            Console.WriteLine("╚══════════════════════════════════════════════════════════╝");
+            Console.WriteLine("\nНажмите любую клавишу для выхода...");
+            Console.ReadKey();
         }
 
         // ==================== ОСНОВНОЕ ДВИЖЕНИЕ ====================
@@ -1030,33 +1337,41 @@ namespace ConsoleApp46
         public static void MovePlayer(ref int playerX, ref int playerY, int dx, int dy, char[,] fullMap, Person hero,
             ref bool inCave, ref char[,] caveMap, ref int cavePlayerX, ref int cavePlayerY,
             ref bool inTitanic, ref char[,] titanicMap, ref int titanicPlayerX, ref int titanicPlayerY,
-            ref bool inHut, ref char[,] hutMap, ref int hutPlayerX, ref int hutPlayerY,
-            ref bool puzzleSolved, ref bool hasArtifact, ref int babaX, ref int babaY)
+            ref bool inHouse, ref char[,] houseMap, ref int housePlayerX, ref int housePlayerY,
+            ref bool puzzleSolved, ref bool hasFish, ref bool hasReward, ref int catX, ref int catY,
+            ref bool catCatched, ref int fishCount)
         {
             try
             {
                 if (fullMap == null)
+                {
                     throw new GameException("Карта не инициализирована", "M008", "Map", ErrorSeverity.Critical);
+                }
                 if (hero == null)
+                {
                     throw new GameException("Объект героя не инициализирован", "M009", "Map", ErrorSeverity.Critical);
+                }
 
                 int newX = playerX + dx;
                 int newY = playerY + dy;
 
                 if (newX < 0 || newX >= fullMap.GetLength(0) || newY < 0 || newY >= fullMap.GetLength(1))
+                {
                     throw new GameException("Попытка выйти за границы карты", "M010", "Map", ErrorSeverity.Medium);
+                }
 
                 char cell = fullMap[newX, newY];
 
                 if (cell == '^' || cell == '%')
                 {
-                    Console.SetCursorPosition(0, 26);
-                    Console.WriteLine("Вы не можете пройти!                          ");
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine("Вы не можете пройти!");
                     System.Threading.Thread.Sleep(500);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
                     return;
                 }
 
-                // Вход в пещеру
                 if (cell == 'O')
                 {
                     inCave = true;
@@ -1066,16 +1381,17 @@ namespace ConsoleApp46
                     caveMap = CreateCaveWithPuzzle();
                     caveMap[cavePlayerX, cavePlayerY] = '@';
 
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.SetCursorPosition(0, 30);
                     Console.WriteLine("🧩 ВЫ ВОШЛИ В ПЕЩЕРУ С ЗАГАДКОЙ! 🧩");
                     Console.WriteLine("   Нужно поставить все камни (o) на желтые цели (O)!");
-                    Console.ResetColor();
                     System.Threading.Thread.Sleep(3000);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 31);
+                    Console.WriteLine(new string(' ', 60));
                     return;
                 }
 
-                // Вход в Титаник
                 if (cell == 'T')
                 {
                     titanicPlayerX = 12;
@@ -1084,64 +1400,88 @@ namespace ConsoleApp46
                     titanicMap[titanicPlayerX, titanicPlayerY] = '@';
                     inTitanic = true;
 
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine("🚢 ВЫ ПОПАЛИ НА ТИТАНИК! Каждый шаг отнимает здоровье! 🚢");
-                    Console.ResetColor();
-                    System.Threading.Thread.Sleep(2000);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine("🚢 ВЫ ПОПАЛИ НА ТИТАНИК! 🚢");
+                    Console.WriteLine("   - Каждый шаг отнимает 1 HP");
+                    Console.WriteLine("   - Ловите рыбу (F) для инвентаря");
+                    Console.WriteLine("   - Обходите водоросли (W)");
+                    Console.WriteLine("   - Остерегайтесь подводных течений (*)");
+                    System.Threading.Thread.Sleep(4000);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 31);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 32);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 33);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 34);
+                    Console.WriteLine(new string(' ', 60));
                     return;
                 }
 
-                // Вход в домик
                 if (cell == 'F')
                 {
-                    hutPlayerX = 12;
-                    hutPlayerY = 12;
-                    hutMap = CreateHutMap();
-                    hutMap[hutPlayerX, hutPlayerY] = '@';
-                    inHut = true;
-                    hasArtifact = false;
+                    housePlayerX = 12;
+                    housePlayerY = 12;
+                    houseMap = CreateHouseMap();
+                    houseMap[housePlayerX, housePlayerY] = '@';
+                    inHouse = true;
+                    hasReward = false;
+                    catCatched = false;
+                    hasFish = (fishCount > 0);
 
                     for (int i = 0; i < 25; i++)
                     {
                         for (int j = 0; j < 25; j++)
                         {
-                            if (hutMap[i, j] == 'B')
+                            if (houseMap[i, j] == 'K')
                             {
-                                babaX = i;
-                                babaY = j;
+                                catX = i;
+                                catY = j;
                                 break;
                             }
                         }
                     }
 
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.DarkYellow;
-                    Console.WriteLine("🏚️ ВЫ ВОШЛИ В ДОМИК БАБЫ ЯГИ! 🏚️");
-                    Console.WriteLine("   Баба Яга двигается по полю! Найдите сундук (C) с артефактом!");
-                    Console.ResetColor();
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine("🏠 ВЫ ВОШЛИ В ДОМИК! 🏠");
+                    if (hasFish)
+                    {
+                        Console.WriteLine("   🐟 У вас есть рыба! Подойдите к коту (K), чтобы поймать его!");
+                        Console.WriteLine("   🐱 Кот убегает, если вы подходите без рыбы!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("   🐟 У вас нет рыбы! Поймайте рыбу в Титанике!");
+                        Console.WriteLine("   🐱 Кот убегает, если вы к нему приближаетесь!");
+                    }
                     System.Threading.Thread.Sleep(3000);
+                    Console.SetCursorPosition(0, 30);
+                    Console.WriteLine(new string(' ', 60));
+                    Console.SetCursorPosition(0, 31);
+                    Console.WriteLine(new string(' ', 60));
                     return;
                 }
 
                 if (cell == '&')
                 {
                     Console.Clear();
-                    Person Enemy = new Person(levelWorld * 10);
-                    Random battleRnd = new Random();
+                    Person enemy = new Person(LevelWorld * 10);
+                    Random battleRandom = new Random();
 
-                    while (Enemy.HP > 0 && hero.HP > 0)
+                    while (enemy.HP > 0 && hero.HP > 0)
                     {
-                        int Shot = battleRnd.Next(10);
-                        Enemy.HP -= Shot + hero.Strenght;
-                        Shot = battleRnd.Next(10);
-                        hero.HP -= Shot + levelWorld * 5;
+                        int shot = battleRandom.Next(10);
+                        enemy.HP -= shot + hero.Strength;
+                        shot = battleRandom.Next(10);
+                        hero.HP -= shot + LevelWorld * 5;
                     }
 
-                    if (Enemy.HP < hero.HP)
+                    if (enemy.HP < hero.HP)
                     {
-                        hero.coin += battleRnd.Next(100);
-                        fullMap[newX, newY] = groundTypes[newX, newY];
+                        hero.Coins += battleRandom.Next(100);
+                        fullMap[newX, newY] = _groundTypes[newX, newY];
                     }
                     else
                     {
@@ -1156,26 +1496,28 @@ namespace ConsoleApp46
                 {
                     hero.MaxHP += 10;
                     hero.HP += hero.MaxHP / 10;
-                    fullMap[newX, newY] = groundTypes[newX, newY];
+                    fullMap[newX, newY] = _groundTypes[newX, newY];
                 }
                 else if (cell == '0')
                 {
-                    Console.SetCursorPosition(0, 28);
-                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.SetCursorPosition(0, 30);
                     Console.WriteLine("🌀 ВЫ ВОШЛИ В ПОРТАЛ! Переход на следующий уровень... 🌀");
-                    Console.ResetColor();
                     System.Threading.Thread.Sleep(2000);
 
                     hero.HP = hero.MaxHP;
-                    levelWorld++;
-                    fullMap[playerX, playerY] = groundTypes[playerX, playerY];
+                    LevelWorld++;
+                    fullMap[playerX, playerY] = _groundTypes[playerX, playerY];
                     playerX = fullMap.GetLength(0) / 2;
                     playerY = fullMap.GetLength(1) / 2;
 
                     char[,] newMap = CreateFullMap();
                     for (int i = 0; i < fullMap.GetLength(0); i++)
+                    {
                         for (int j = 0; j < fullMap.GetLength(1); j++)
+                        {
                             fullMap[i, j] = newMap[i, j];
+                        }
+                    }
 
                     fullMap[playerX, playerY] = '@';
                     return;
@@ -1183,14 +1525,16 @@ namespace ConsoleApp46
                 else if (cell == '+')
                 {
                     Forge(hero);
-                    fullMap[newX, newY] = groundTypes[newX, newY];
+                    fullMap[newX, newY] = _groundTypes[newX, newY];
                 }
 
                 char groundType = fullMap[newX, newY];
-                if ((groundType == '~' || groundType == '#') && groundTypes[newX, newY] == '.')
-                    groundTypes[newX, newY] = groundType;
+                if ((groundType == '~' || groundType == '#') && _groundTypes[newX, newY] == '.')
+                {
+                    _groundTypes[newX, newY] = groundType;
+                }
 
-                fullMap[playerX, playerY] = groundTypes[playerX, playerY];
+                fullMap[playerX, playerY] = _groundTypes[playerX, playerY];
                 playerX = newX;
                 playerY = newY;
                 fullMap[playerX, playerY] = '@';
@@ -1204,29 +1548,34 @@ namespace ConsoleApp46
             }
         }
 
-        public static void Forge(Person Hero)
+        public static void Forge(Person hero)
         {
             try
             {
-                if (Hero == null)
+                if (hero == null)
+                {
                     throw new GameException("Объект героя не инициализирован", "M011", "Map", ErrorSeverity.High);
+                }
 
+                Console.Clear();
                 Console.WriteLine("Выберите действие:");
                 Console.WriteLine("1. Улучшить силу на 2 (250 монет)");
                 Console.WriteLine("Для выхода нажмите Enter");
-                Console.WriteLine($"Оставшиеся деньги: {Hero.coin}");
+                Console.WriteLine($"Оставшиеся деньги: {hero.Coins}");
 
                 ConsoleKey key;
                 while ((key = Console.ReadKey().Key) != ConsoleKey.Enter)
                 {
-                    if (key == ConsoleKey.NumPad1 && Hero.coin > 250)
+                    if (key == ConsoleKey.NumPad1 && hero.Coins > 250)
                     {
-                        Hero.Strenght += 2;
-                        Hero.coin -= 250;
-                        Console.WriteLine($"\nСила увеличена! Текущая сила: {Hero.Strenght}");
+                        hero.Strength += 2;
+                        hero.Coins -= 250;
+                        Console.WriteLine($"\nСила увеличена! Текущая сила: {hero.Strength}");
                     }
                     else if (key == ConsoleKey.NumPad1)
+                    {
                         Console.WriteLine("\nНедостаточно монет!");
+                    }
                 }
             }
             catch (GameException ex)
