@@ -3,11 +3,17 @@ using System.Collections.Generic;
 
 namespace ConsoleApp46
 {
+    /// <summary>
+    /// Класс, отвечающий за генерацию, отображение и управление игровой картой
+    /// </summary>
     public class Map
     {
         private static char[,] _groundTypes;
         private static readonly Random _random = new Random();
 
+        /// <summary>
+        /// Текущий уровень мира
+        /// </summary>
         public static int LevelWorld = 1;
 
         private const int MapWidth = 1500;
@@ -17,6 +23,12 @@ namespace ConsoleApp46
 
         // ==================== ОСНОВНЫЕ МЕТОДЫ ====================
 
+        /// <summary>
+        /// Отображает фрагмент карты размером 25x25 вокруг игрока
+        /// </summary>
+        /// <param name="fullMap">Двумерный массив символов, представляющий полную карту</param>
+        /// <param name="playerWorldX">Координата X игрока на карте</param>
+        /// <param name="playerWorldY">Координата Y игрока на карте</param>
         public static void GetMap(char[,] fullMap, int playerWorldX, int playerWorldY)
         {
             try
@@ -54,34 +66,76 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Отрисовывает отдельную клетку карты с соответствующим цветом
+        /// </summary>
+        /// <param name="cell">Символ клетки</param>
         private static void DrawCell(char cell)
         {
             switch (cell)
             {
-                case '0': Console.ForegroundColor = ConsoleColor.Blue; break;
-                case '&': Console.ForegroundColor = ConsoleColor.Green; break;
-                case 'H': Console.ForegroundColor = ConsoleColor.Red; break;
-                case '+': Console.ForegroundColor = ConsoleColor.Yellow; break;
-                case '%': Console.ForegroundColor = ConsoleColor.Gray; break;
-                case '@': Console.ForegroundColor = ConsoleColor.Cyan; break;
-                case '^': Console.ForegroundColor = ConsoleColor.DarkGray; break;
-                case '~': Console.ForegroundColor = ConsoleColor.Blue; break;
-                case '#': Console.ForegroundColor = ConsoleColor.DarkGreen; break;
-                case 'O': Console.ForegroundColor = ConsoleColor.Magenta; break;
-                case 'T': Console.ForegroundColor = ConsoleColor.DarkYellow; break;
-                case 'F': Console.ForegroundColor = ConsoleColor.DarkYellow; break;
-                case 'o': Console.ForegroundColor = ConsoleColor.DarkGray; break;
-                case '★': Console.ForegroundColor = ConsoleColor.Yellow; break;
-                case 'C': Console.ForegroundColor = ConsoleColor.Yellow; break;
-                case 'K': Console.ForegroundColor = ConsoleColor.DarkYellow; break;
-                case 'W': Console.ForegroundColor = ConsoleColor.DarkGreen; break;
-                case '*': Console.ForegroundColor = ConsoleColor.Blue; break;
-                default: Console.ResetColor(); break;
+                case '0':
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                case '&':
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    break;
+                case 'H':
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    break;
+                case '+':
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                case '%':
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    break;
+                case '@':
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    break;
+                case '^':
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
+                case '~':
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                case '#':
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    break;
+                case 'O':
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    break;
+                case 'T':
+                case 'F':
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    break;
+                case 'o':
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    break;
+                case '★':
+                case 'C':
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    break;
+                case 'K':
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    break;
+                case 'W':
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    break;
+                case '*':
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    break;
+                default:
+                    Console.ResetColor();
+                    break;
             }
             Console.Write(cell + " ");
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Создает полную карту мира размером 1500x1500 со всеми объектами
+        /// </summary>
+        /// <returns>Двумерный массив символов, представляющий карту мира</returns>
         public static char[,] CreateFullMap()
         {
             try
@@ -98,8 +152,16 @@ namespace ConsoleApp46
                     }
                 }
 
-                for (int i = 0; i < 1600; i++) GenerateRiver(fullMap);
-                for (int i = 0; i < 2000; i++) GenerateForest(fullMap);
+                for (int i = 0; i < 1600; i++)
+                {
+                    GenerateRiver(fullMap);
+                }
+
+                for (int i = 0; i < 2000; i++)
+                {
+                    GenerateForest(fullMap);
+                }
+
                 for (int i = 0; i < 2700; i++)
                 {
                     int x = _random.Next(20, MapHeight - 20);
@@ -119,6 +181,10 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Генерирует извилистую реку на карте
+        /// </summary>
+        /// <param name="fullMap">Карта, на которой генерируется река</param>
         private static void GenerateRiver(char[,] fullMap)
         {
             try
@@ -151,10 +217,18 @@ namespace ConsoleApp46
 
                     switch (direction)
                     {
-                        case 0: currentX--; break;
-                        case 1: currentY++; break;
-                        case 2: currentX++; break;
-                        case 3: currentY--; break;
+                        case 0:
+                            currentX--;
+                            break;
+                        case 1:
+                            currentY++;
+                            break;
+                        case 2:
+                            currentX++;
+                            break;
+                        case 3:
+                            currentY--;
+                            break;
                     }
 
                     if (currentX < 5 || currentX >= MapHeight - 5 || currentY < 5 || currentY >= MapWidth - 5)
@@ -171,6 +245,10 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Генерирует лесной массив на карте
+        /// </summary>
+        /// <param name="fullMap">Карта, на которой генерируется лес</param>
         private static void GenerateForest(char[,] fullMap)
         {
             try
@@ -207,6 +285,12 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Создает гору с центром в указанных координатах
+        /// </summary>
+        /// <param name="fullMap">Карта, на которой создается гора</param>
+        /// <param name="centerX">Координата X центра горы</param>
+        /// <param name="centerY">Координата Y центра горы</param>
         private static void CreateMountain(char[,] fullMap, int centerX, int centerY)
         {
             try
@@ -221,7 +305,11 @@ namespace ConsoleApp46
                 {
                     for (int dy = -1; dy <= 1; dy++)
                     {
-                        if (dx == 0 && dy == 0) continue;
+                        if (dx == 0 && dy == 0)
+                        {
+                            continue;
+                        }
+
                         int x = centerX + dx;
                         int y = centerY + dy;
                         if (x >= 0 && x < fullMap.GetLength(0) && y >= 0 && y < fullMap.GetLength(1))
@@ -282,6 +370,10 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Генерирует входы в уникальные локации (пещера, Титаник, домик)
+        /// </summary>
+        /// <param name="fullMap">Карта, на которой создаются порталы</param>
         private static void GeneratePortals(char[,] fullMap)
         {
             try
@@ -331,24 +423,44 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Проверяет наличие целевого символа в соседних клетках
+        /// </summary>
+        /// <param name="fullMap">Карта</param>
+        /// <param name="x">Координата X</param>
+        /// <param name="y">Координата Y</param>
+        /// <param name="target">Целевой символ</param>
+        /// <returns>true, если рядом есть целевой символ</returns>
         private static bool HasNearby(char[,] fullMap, int x, int y, char target)
         {
             for (int dx = -1; dx <= 1; dx++)
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
-                    if (dx == 0 && dy == 0) continue;
+                    if (dx == 0 && dy == 0)
+                    {
+                        continue;
+                    }
+
                     int nx = x + dx;
                     int ny = y + dy;
                     if (nx >= 0 && nx < MapHeight && ny >= 0 && ny < MapWidth)
                     {
-                        if (fullMap[nx, ny] == target) return true;
+                        if (fullMap[nx, ny] == target)
+                        {
+                            return true;
+                        }
                     }
                 }
             }
+
             return false;
         }
 
+        /// <summary>
+        /// Генерирует врагов, сердца и стены на карте
+        /// </summary>
+        /// <param name="fullMap">Карта</param>
         private static void GenerateObjects(char[,] fullMap)
         {
             try
@@ -393,6 +505,13 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Проверяет, есть ли враги в видимой области 25x25 вокруг игрока
+        /// </summary>
+        /// <param name="fullMap">Карта</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <returns>true, если враги найдены, иначе false</returns>
         public static bool HasEnemiesInView(char[,] fullMap, int playerX, int playerY)
         {
             try
@@ -417,6 +536,7 @@ namespace ConsoleApp46
                         }
                     }
                 }
+
                 return false;
             }
             catch (GameException ex)
@@ -426,6 +546,11 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Проверяет, есть ли портал на карте
+        /// </summary>
+        /// <param name="fullMap">Карта</param>
+        /// <returns>true, если портал найден, иначе false</returns>
         public static bool IsPortalOnMap(char[,] fullMap)
         {
             for (int i = 0; i < fullMap.GetLength(0); i++)
@@ -438,9 +563,16 @@ namespace ConsoleApp46
                     }
                 }
             }
+
             return false;
         }
 
+        /// <summary>
+        /// Создает портал рядом с игроком, если в видимой области нет врагов
+        /// </summary>
+        /// <param name="fullMap">Карта</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
         public static void CheckAndSpawnPortal(char[,] fullMap, ref int playerX, ref int playerY)
         {
             try
@@ -451,7 +583,11 @@ namespace ConsoleApp46
                     {
                         for (int dy = -1; dy <= 1; dy++)
                         {
-                            if (dx == 0 && dy == 0) continue;
+                            if (dx == 0 && dy == 0)
+                            {
+                                continue;
+                            }
+
                             int portalX = playerX + dx;
                             int portalY = playerY + dy;
                             if (portalX >= 5 && portalX < fullMap.GetLength(0) - 5 &&
@@ -481,6 +617,10 @@ namespace ConsoleApp46
 
         // ==================== ПЕЩЕРА С ЗАГАДКОЙ ====================
 
+        /// <summary>
+        /// Создает карту пещеры с загадкой (камни и цели)
+        /// </summary>
+        /// <returns>Карта пещеры 25x25</returns>
         public static char[,] CreateCaveWithPuzzle()
         {
             char[,] caveMap = new char[25, 25];
@@ -515,6 +655,12 @@ namespace ConsoleApp46
             return caveMap;
         }
 
+        /// <summary>
+        /// Отображает карту пещеры с загадкой
+        /// </summary>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
         public static void RenderCaveWithPuzzle(char[,] caveMap, Person hero, bool puzzleSolved)
         {
             Console.Clear();
@@ -583,30 +729,72 @@ namespace ConsoleApp46
             Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
         }
 
+        /// <summary>
+        /// Проверяет, решена ли загадка в пещере
+        /// </summary>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <returns>true, если все камни на целях</returns>
         public static bool CheckCavePuzzleSolved(char[,] caveMap)
         {
-            if (caveMap[5, 5] != 'o') return false;
-            if (caveMap[5, 19] != 'o') return false;
-            if (caveMap[19, 5] != 'o') return false;
-            if (caveMap[19, 19] != 'o') return false;
+            if (caveMap[5, 5] != 'o')
+            {
+                return false;
+            }
+
+            if (caveMap[5, 19] != 'o')
+            {
+                return false;
+            }
+
+            if (caveMap[19, 5] != 'o')
+            {
+                return false;
+            }
+
+            if (caveMap[19, 19] != 'o')
+            {
+                return false;
+            }
+
             return true;
         }
 
+        /// <summary>
+        /// Толкает камень в пещере на 1 клетку в направлении движения
+        /// </summary>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <param name="dx">Смещение по X</param>
+        /// <param name="dy">Смещение по Y</param>
         public static void PushStoneInCave(ref char[,] caveMap, ref int playerX, ref int playerY, int dx, int dy)
         {
             int stoneX = playerX + dx;
             int stoneY = playerY + dy;
 
-            if (stoneX < 0 || stoneX >= 25 || stoneY < 0 || stoneY >= 25) return;
-            if (caveMap[stoneX, stoneY] != 'o') return;
+            if (stoneX < 0 || stoneX >= 25 || stoneY < 0 || stoneY >= 25)
+            {
+                return;
+            }
+
+            if (caveMap[stoneX, stoneY] != 'o')
+            {
+                return;
+            }
 
             int newX = stoneX + dx;
             int newY = stoneY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+            {
+                return;
+            }
 
             char targetCell = caveMap[newX, newY];
-            if (targetCell == '#' || targetCell == 'o') return;
+            if (targetCell == '#' || targetCell == 'o')
+            {
+                return;
+            }
 
             bool currentWasTarget = (caveMap[stoneX, stoneY] == 'O');
 
@@ -635,13 +823,27 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Обрабатывает движение игрока в пещере с загадкой
+        /// </summary>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <param name="dx">Смещение по X</param>
+        /// <param name="dy">Смещение по Y</param>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="inCave">Флаг нахождения в пещере</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
+        /// <param name="hero">Объект героя</param>
         public static void MoveInCaveWithPuzzle(ref int playerX, ref int playerY, int dx, int dy,
             ref char[,] caveMap, ref bool inCave, ref bool puzzleSolved, Person hero)
         {
             int newX = playerX + dx;
             int newY = playerY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+            {
+                return;
+            }
 
             char cell = caveMap[newX, newY];
 
@@ -658,7 +860,10 @@ namespace ConsoleApp46
                 return;
             }
 
-            if (cell == '#') return;
+            if (cell == '#')
+            {
+                return;
+            }
 
             if (cell == 'o')
             {
@@ -678,11 +883,15 @@ namespace ConsoleApp46
                     hero.Coins += 200;
                     hero.MaxHP += 20;
                     hero.HP += 20;
-                    if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
+                    if (hero.HP > hero.MaxHP)
+                    {
+                        hero.HP = hero.MaxHP;
+                    }
 
                     Console.SetCursorPosition(0, 30);
                     Console.WriteLine(new string(' ', 60));
                 }
+
                 return;
             }
 
@@ -715,7 +924,10 @@ namespace ConsoleApp46
                 hero.Coins += 200;
                 hero.MaxHP += 20;
                 hero.HP += 20;
-                if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
+                if (hero.HP > hero.MaxHP)
+                {
+                    hero.HP = hero.MaxHP;
+                }
 
                 Console.SetCursorPosition(0, 30);
                 Console.WriteLine(new string(' ', 60));
@@ -724,6 +936,10 @@ namespace ConsoleApp46
 
         // ==================== ЛОКАЦИЯ ТИТАНИК ====================
 
+        /// <summary>
+        /// Создает карту Титаника с рыбами, водорослями и течениями
+        /// </summary>
+        /// <returns>Карта Титаника 25x25</returns>
         public static char[,] CreateTitanicMap()
         {
             char[,] titanicMap = new char[25, 25];
@@ -774,6 +990,12 @@ namespace ConsoleApp46
             return titanicMap;
         }
 
+        /// <summary>
+        /// Отображает карту Титаника
+        /// </summary>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
         public static void RenderTitanicMap(char[,] titanicMap, Person hero, int fishCount)
         {
             Console.Clear();
@@ -837,17 +1059,33 @@ namespace ConsoleApp46
             Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
         }
 
+        /// <summary>
+        /// Применяет эффект течения на игрока
+        /// </summary>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <returns>true, если игрок был перемещен</returns>
         private static bool ApplyCurrent(ref int playerX, ref int playerY, char[,] titanicMap)
         {
             int direction = _random.Next(4);
-            int dx = 0, dy = 0;
+            int dx = 0;
+            int dy = 0;
 
             switch (direction)
             {
-                case 0: dx = -1; break;
-                case 1: dy = 1; break;
-                case 2: dx = 1; break;
-                case 3: dy = -1; break;
+                case 0:
+                    dx = -1;
+                    break;
+                case 1:
+                    dy = 1;
+                    break;
+                case 2:
+                    dx = 1;
+                    break;
+                case 3:
+                    dy = -1;
+                    break;
             }
 
             int newX = playerX;
@@ -859,8 +1097,15 @@ namespace ConsoleApp46
                 int nextX = newX + dx;
                 int nextY = newY + dy;
 
-                if (nextX < 0 || nextX >= 25 || nextY < 0 || nextY >= 25) break;
-                if (titanicMap[nextX, nextY] == 'W' || titanicMap[nextX, nextY] == 'T') break;
+                if (nextX < 0 || nextX >= 25 || nextY < 0 || nextY >= 25)
+                {
+                    break;
+                }
+
+                if (titanicMap[nextX, nextY] == 'W' || titanicMap[nextX, nextY] == 'T')
+                {
+                    break;
+                }
 
                 newX = nextX;
                 newY = nextY;
@@ -876,13 +1121,28 @@ namespace ConsoleApp46
             return false;
         }
 
+        /// <summary>
+        /// Обрабатывает движение игрока в Титанике
+        /// </summary>
+        /// <param name="titanicPlayerX">Координата X игрока в Титанике</param>
+        /// <param name="titanicPlayerY">Координата Y игрока в Титанике</param>
+        /// <param name="dx">Смещение по X</param>
+        /// <param name="dy">Смещение по Y</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="inTitanic">Флаг нахождения в Титанике</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
         public static void MoveInTitanic(ref int titanicPlayerX, ref int titanicPlayerY, int dx, int dy,
             char[,] titanicMap, ref bool inTitanic, Person hero, ref int fishCount, ref bool hasFish)
         {
             int newX = titanicPlayerX + dx;
             int newY = titanicPlayerY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+            {
+                return;
+            }
 
             char cell = titanicMap[newX, newY];
 
@@ -988,6 +1248,10 @@ namespace ConsoleApp46
 
         // ==================== ЛОКАЦИЯ ДОМИК ====================
 
+        /// <summary>
+        /// Создает карту домика
+        /// </summary>
+        /// <returns>Карта домика 25x25</returns>
         public static char[,] CreateHouseMap()
         {
             char[,] houseMap = new char[25, 25];
@@ -1000,7 +1264,6 @@ namespace ConsoleApp46
                 }
             }
 
-            // Стены по краям
             for (int i = 0; i < 25; i++)
             {
                 houseMap[0, i] = '#';
@@ -1009,7 +1272,6 @@ namespace ConsoleApp46
                 houseMap[i, 24] = '#';
             }
 
-            // Комната (декоративные стены, но кот ходит везде)
             for (int i = 8; i <= 16; i++)
             {
                 for (int j = 8; j <= 16; j++)
@@ -1021,18 +1283,21 @@ namespace ConsoleApp46
                 }
             }
 
-            // Вход в комнату
             houseMap[12, 8] = '.';
-
-            // Кот (ходит по всей карте, не только в комнате)
             houseMap[14, 14] = 'K';
-
-            // Выход из домика
             houseMap[12, 20] = 'F';
 
             return houseMap;
         }
 
+        /// <summary>
+        /// Отображает карту домика
+        /// </summary>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
         public static void RenderHouseMap(char[,] houseMap, Person hero, bool hasFish, bool hasReward, bool catCatched)
         {
             Console.Clear();
@@ -1049,6 +1314,7 @@ namespace ConsoleApp46
             {
                 Console.WriteLine("║  ✨ Кот пойман! Можете выходить через F ✨             ║");
             }
+
             if (!hasFish && !catCatched)
             {
                 Console.WriteLine("║  🐟 Вам нужна рыба, чтобы поймать кота!                ║");
@@ -1058,6 +1324,7 @@ namespace ConsoleApp46
             {
                 Console.WriteLine("║  🐟 У вас есть рыба! Подойдите к коту (K)!             ║");
             }
+
             Console.WriteLine("╚══════════════════════════════════════════════════════════╝");
             Console.WriteLine();
 
@@ -1117,13 +1384,23 @@ namespace ConsoleApp46
             {
                 Console.WriteLine("✨ Кот пойман! Можете выходить через F");
             }
+
             Console.WriteLine($"\nЗдоровье: {hero.HP}/{hero.MaxHP} | Монет: {hero.Coins} | 🐟 Рыба: {(hasFish ? "есть" : "нет")}");
             Console.WriteLine("Стрелки - движение | I - инвентарь | S - сохранить | L - загрузить");
         }
 
+        /// <summary>
+        /// Двигает кота по карте в случайном направлении
+        /// </summary>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="catX">Координата X кота</param>
+        /// <param name="catY">Координата Y кота</param>
         private static void MoveCat(ref char[,] houseMap, ref int catX, ref int catY)
         {
-            if (catX == -1 && catY == -1) return;
+            if (catX == -1 && catY == -1)
+            {
+                return;
+            }
 
             int[] dx = { -1, 1, 0, 0 };
             int[] dy = { 0, 0, -1, 1 };
@@ -1143,11 +1420,13 @@ namespace ConsoleApp46
                 int newX = catX + dx[dir];
                 int newY = catY + dy[dir];
 
-                if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) continue;
+                if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+                {
+                    continue;
+                }
 
                 char targetCell = houseMap[newX, newY];
 
-                // Кот может ходить по всей карте (по пустым клеткам и по клеткам с игроком)
                 if (targetCell == '.' || targetCell == '@')
                 {
                     houseMap[catX, catY] = '.';
@@ -1159,7 +1438,6 @@ namespace ConsoleApp46
                 }
             }
 
-            // 30% шанс, что кот сделает дополнительный шаг
             if (moved && _random.Next(100) < 30)
             {
                 foreach (int dir in directions)
@@ -1167,7 +1445,10 @@ namespace ConsoleApp46
                     int newX = catX + dx[dir];
                     int newY = catY + dy[dir];
 
-                    if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) continue;
+                    if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+                    {
+                        continue;
+                    }
 
                     char targetCell = houseMap[newX, newY];
 
@@ -1183,18 +1464,36 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Обрабатывает движение игрока в домике
+        /// </summary>
+        /// <param name="housePlayerX">Координата X игрока в домике</param>
+        /// <param name="housePlayerY">Координата Y игрока в домике</param>
+        /// <param name="dx">Смещение по X</param>
+        /// <param name="dy">Смещение по Y</param>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="inHouse">Флаг нахождения в домике</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catX">Координата X кота</param>
+        /// <param name="catY">Координата Y кота</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
+        /// <param name="hero">Объект героя</param>
         public static void MoveInHouse(ref int housePlayerX, ref int housePlayerY, int dx, int dy,
-    ref char[,] houseMap, ref bool inHouse, ref bool hasFish, ref bool hasReward,
-    ref int catX, ref int catY, ref bool catCatched, ref int fishCount, Person hero)
+            ref char[,] houseMap, ref bool inHouse, ref bool hasFish, ref bool hasReward,
+            ref int catX, ref int catY, ref bool catCatched, ref int fishCount, Person hero)
         {
             int newX = housePlayerX + dx;
             int newY = housePlayerY + dy;
 
-            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25) return;
+            if (newX < 0 || newX >= 25 || newY < 0 || newY >= 25)
+            {
+                return;
+            }
 
             char cell = houseMap[newX, newY];
 
-            // Выход из домика
             if (cell == 'F')
             {
                 inHouse = false;
@@ -1208,15 +1507,15 @@ namespace ConsoleApp46
                 return;
             }
 
-            // Стены
-            if (cell == '#') return;
+            if (cell == '#')
+            {
+                return;
+            }
 
-            // Если кот еще не пойман и игрок наступает на кота
             if (cell == 'K' && !catCatched)
             {
                 if (hasFish)
                 {
-                    // Поймали кота
                     fishCount--;
                     hasFish = (fishCount > 0);
                     catCatched = true;
@@ -1241,9 +1540,11 @@ namespace ConsoleApp46
                     hero.Coins += 300;
                     hero.MaxHP += 30;
                     hero.HP += 30;
-                    if (hero.HP > hero.MaxHP) hero.HP = hero.MaxHP;
+                    if (hero.HP > hero.MaxHP)
+                    {
+                        hero.HP = hero.MaxHP;
+                    }
 
-                    // Перемещаем игрока на место кота
                     houseMap[housePlayerX, housePlayerY] = '.';
                     housePlayerX = newX;
                     housePlayerY = newY;
@@ -1257,11 +1558,11 @@ namespace ConsoleApp46
                 }
                 else
                 {
-                    // Кот убегает на случайное место по всей карте
                     int oldCatX = catX;
                     int oldCatY = catY;
 
-                    int newCatX, newCatY;
+                    int newCatX;
+                    int newCatY;
                     do
                     {
                         newCatX = _random.Next(1, 24);
@@ -1281,19 +1582,15 @@ namespace ConsoleApp46
                     System.Threading.Thread.Sleep(1500);
                     Console.SetCursorPosition(0, 30);
                     Console.WriteLine(new string(' ', 60));
-
-                    // Игрок не двигается, так как кот убежал
                     return;
                 }
             }
 
-            // Обычное движение игрока (если не наступил на кота)
             houseMap[housePlayerX, housePlayerY] = '.';
             housePlayerX = newX;
             housePlayerY = newY;
             houseMap[housePlayerX, housePlayerY] = '@';
 
-            // Кот двигается только если еще не пойман
             if (!catCatched)
             {
                 MoveCat(ref houseMap, ref catX, ref catY);
@@ -1302,6 +1599,12 @@ namespace ConsoleApp46
 
         // ==================== ИНВЕНТАРЬ ====================
 
+        /// <summary>
+        /// Отображает инвентарь игрока
+        /// </summary>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
+        /// <param name="hasArtifact">Флаг наличия артефакта</param>
         public static void ShowInventory(Person hero, int fishCount, bool hasArtifact)
         {
             Console.Clear();
@@ -1334,6 +1637,34 @@ namespace ConsoleApp46
 
         // ==================== ОСНОВНОЕ ДВИЖЕНИЕ ====================
 
+        /// <summary>
+        /// Обрабатывает движение игрока на основной карте
+        /// </summary>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <param name="dx">Смещение по X</param>
+        /// <param name="dy">Смещение по Y</param>
+        /// <param name="fullMap">Карта мира</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="inCave">Флаг нахождения в пещере</param>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="cavePlayerX">Координата X в пещере</param>
+        /// <param name="cavePlayerY">Координата Y в пещере</param>
+        /// <param name="inTitanic">Флаг нахождения в Титанике</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="titanicPlayerX">Координата X в Титанике</param>
+        /// <param name="titanicPlayerY">Координата Y в Титанике</param>
+        /// <param name="inHouse">Флаг нахождения в домике</param>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="housePlayerX">Координата X в домике</param>
+        /// <param name="housePlayerY">Координата Y в домике</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catX">Координата X кота</param>
+        /// <param name="catY">Координата Y кота</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
         public static void MovePlayer(ref int playerX, ref int playerY, int dx, int dy, char[,] fullMap, Person hero,
             ref bool inCave, ref char[,] caveMap, ref int cavePlayerX, ref int cavePlayerY,
             ref bool inTitanic, ref char[,] titanicMap, ref int titanicPlayerX, ref int titanicPlayerY,
@@ -1347,6 +1678,7 @@ namespace ConsoleApp46
                 {
                     throw new GameException("Карта не инициализирована", "M008", "Map", ErrorSeverity.Critical);
                 }
+
                 if (hero == null)
                 {
                     throw new GameException("Объект героя не инициализирован", "M009", "Map", ErrorSeverity.Critical);
@@ -1548,6 +1880,10 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Открывает меню кузницы для улучшения силы
+        /// </summary>
+        /// <param name="hero">Объект героя</param>
         public static void Forge(Person hero)
         {
             try

@@ -3,8 +3,15 @@ using System.Collections.Generic;
 
 namespace ConsoleApp46
 {
+    /// <summary>
+    /// Главный класс программы, точка входа в игру
+    /// </summary>
     internal class Program
     {
+        /// <summary>
+        /// Точка входа в приложение
+        /// </summary>
+        /// <param name="args">Аргументы командной строки</param>
         private static void Main(string[] args)
         {
             try
@@ -77,6 +84,11 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Создает героя с обработкой ошибок
+        /// </summary>
+        /// <param name="heroName">Имя героя</param>
+        /// <returns>Объект героя</returns>
         private static Person CreateHero(string heroName)
         {
             try
@@ -90,6 +102,14 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Инициализирует состояние пещеры
+        /// </summary>
+        /// <param name="inCave">Флаг нахождения в пещере</param>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="cavePlayerX">Координата X игрока в пещере</param>
+        /// <param name="cavePlayerY">Координата Y игрока в пещере</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
         private static void InitializeGameState(out bool inCave, out char[,] caveMap, out int cavePlayerX, out int cavePlayerY, out bool puzzleSolved)
         {
             inCave = false;
@@ -99,6 +119,14 @@ namespace ConsoleApp46
             puzzleSolved = false;
         }
 
+        /// <summary>
+        /// Инициализирует состояние Титаника
+        /// </summary>
+        /// <param name="inTitanic">Флаг нахождения в Титанике</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="titanicPlayerX">Координата X игрока в Титанике</param>
+        /// <param name="titanicPlayerY">Координата Y игрока в Титанике</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
         private static void InitializeTitanicState(out bool inTitanic, out char[,] titanicMap, out int titanicPlayerX, out int titanicPlayerY, out int fishCount)
         {
             inTitanic = false;
@@ -108,6 +136,17 @@ namespace ConsoleApp46
             fishCount = 0;
         }
 
+        /// <summary>
+        /// Инициализирует состояние домика
+        /// </summary>
+        /// <param name="inHouse">Флаг нахождения в домике</param>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="housePlayerX">Координата X игрока в домике</param>
+        /// <param name="housePlayerY">Координата Y игрока в домике</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catX">Координата X кота</param>
+        /// <param name="catY">Координата Y кота</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
         private static void InitializeHouseState(out bool inHouse, out char[,] houseMap, out int housePlayerX, out int housePlayerY, out bool hasReward, out int catX, out int catY, out bool catCatched)
         {
             inHouse = false;
@@ -120,6 +159,12 @@ namespace ConsoleApp46
             catCatched = false;
         }
 
+        /// <summary>
+        /// Очищает область вокруг игрока от объектов
+        /// </summary>
+        /// <param name="fullMap">Полная карта мира</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
         private static void ClearAreaAroundPlayer(char[,] fullMap, int playerX, int playerY)
         {
             for (int i = playerX - 5; i <= playerX + 5; i++)
@@ -134,6 +179,24 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Отображает текущую локацию игрока
+        /// </summary>
+        /// <param name="inCave">Флаг нахождения в пещере</param>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
+        /// <param name="inTitanic">Флаг нахождения в Титанике</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
+        /// <param name="inHouse">Флаг нахождения в домике</param>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
+        /// <param name="fullMap">Полная карта мира</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
         private static void RenderCurrentLocation(bool inCave, char[,] caveMap, Person hero, bool puzzleSolved,
             bool inTitanic, char[,] titanicMap, int fishCount, bool inHouse, char[,] houseMap, bool hasFish, bool hasReward, bool catCatched,
             char[,] fullMap, int playerX, int playerY)
@@ -159,6 +222,13 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Сохраняет игру
+        /// </summary>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="fullMap">Полная карта мира</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
         private static void SaveGame(Person hero, char[,] fullMap, int playerX, int playerY)
         {
             Console.Clear();
@@ -172,6 +242,13 @@ namespace ConsoleApp46
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Загружает игру
+        /// </summary>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="fullMap">Полная карта мира</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
         private static void LoadGame(Person hero, char[,] fullMap, ref int playerX, ref int playerY)
         {
             Console.Clear();
@@ -197,13 +274,41 @@ namespace ConsoleApp46
             Console.ReadKey();
         }
 
+        /// <summary>
+        /// Обрабатывает движение игрока
+        /// </summary>
+        /// <param name="key">Нажатая клавиша</param>
+        /// <param name="playerX">Координата X игрока</param>
+        /// <param name="playerY">Координата Y игрока</param>
+        /// <param name="fullMap">Полная карта мира</param>
+        /// <param name="hero">Объект героя</param>
+        /// <param name="inCave">Флаг нахождения в пещере</param>
+        /// <param name="caveMap">Карта пещеры</param>
+        /// <param name="cavePlayerX">Координата X в пещере</param>
+        /// <param name="cavePlayerY">Координата Y в пещере</param>
+        /// <param name="inTitanic">Флаг нахождения в Титанике</param>
+        /// <param name="titanicMap">Карта Титаника</param>
+        /// <param name="titanicPlayerX">Координата X в Титанике</param>
+        /// <param name="titanicPlayerY">Координата Y в Титанике</param>
+        /// <param name="fishCount">Количество пойманной рыбы</param>
+        /// <param name="hasFish">Флаг наличия рыбы</param>
+        /// <param name="inHouse">Флаг нахождения в домике</param>
+        /// <param name="houseMap">Карта домика</param>
+        /// <param name="housePlayerX">Координата X в домике</param>
+        /// <param name="housePlayerY">Координата Y в домике</param>
+        /// <param name="puzzleSolved">Флаг решения загадки</param>
+        /// <param name="hasReward">Флаг получения награды</param>
+        /// <param name="catX">Координата X кота</param>
+        /// <param name="catY">Координата Y кота</param>
+        /// <param name="catCatched">Флаг поимки кота</param>
         private static void HandleMovement(ConsoleKey key, ref int playerX, ref int playerY, char[,] fullMap, Person hero,
             ref bool inCave, ref char[,] caveMap, ref int cavePlayerX, ref int cavePlayerY,
             ref bool inTitanic, ref char[,] titanicMap, ref int titanicPlayerX, ref int titanicPlayerY, ref int fishCount, ref bool hasFish,
             ref bool inHouse, ref char[,] houseMap, ref int housePlayerX, ref int housePlayerY,
             ref bool puzzleSolved, ref bool hasReward, ref int catX, ref int catY, ref bool catCatched)
         {
-            int dx = 0, dy = 0;
+            int dx = 0;
+            int dy = 0;
             switch (key)
             {
                 case ConsoleKey.UpArrow:
@@ -251,6 +356,10 @@ namespace ConsoleApp46
             }
         }
 
+        /// <summary>
+        /// Выводит сообщение о завершении игры
+        /// </summary>
+        /// <param name="hero">Объект героя</param>
         private static void GameOver(Person hero)
         {
             Console.Clear();
