@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-
 namespace ConsoleApp46
 {
     /// <summary>
@@ -25,6 +23,7 @@ namespace ConsoleApp46
                 string heroName = Console.ReadLine();
 
                 Person hero = CreateHero(heroName);
+                GameFacade gameFacade = new GameFacade(hero);
 
                 GameSession session = new GameSession
                 {
@@ -50,29 +49,26 @@ namespace ConsoleApp46
 
                 while (hero.HP > 0)
                 {
-                    RenderCurrentLocation(session, hero, ref lastLocation);
+                    gameFacade.RenderCurrentLocation(session, ref lastLocation);
 
                     ConsoleKey key = Console.ReadKey(true).Key;
 
                     if (key == ConsoleKey.S)
                     {
-                        SaveGame(hero, session);
+                        gameFacade.SaveGame(session);
                     }
                     else if (key == ConsoleKey.L)
                     {
-                        LoadGame(hero, session);
+                        gameFacade.LoadGame(session);
                     }
                     else if (key == ConsoleKey.I)
                     {
-                        Console.Clear();
-                        session.FishEquipped = Map.ShowInventory(hero, session.FishCount, false, session.FishEquipped);
-                        Console.Clear();
+                        gameFacade.OpenInventory(session);
                         lastLocation = string.Empty;
                     }
                     else if (key == ConsoleKey.Spacebar && session.InHouse)
                     {
-                        Map.ThrowFishInHouse(ref session.HouseMap, session.HousePlayerX, session.HousePlayerY, lastMoveDx, lastMoveDy,
-                            ref session.FishCount, ref session.HasFish, ref session.FishEquipped, ref session.FishDropped, ref session.DroppedFishX, ref session.DroppedFishY);
+                        gameFacade.ThrowFish(session, lastMoveDx, lastMoveDy);
                     }
                     else
                     {
@@ -81,7 +77,7 @@ namespace ConsoleApp46
                         else if (key == ConsoleKey.LeftArrow) { lastMoveDx = 0; lastMoveDy = -1; }
                         else if (key == ConsoleKey.RightArrow) { lastMoveDx = 0; lastMoveDy = 1; }
 
-                        HandleMovement(key, session, hero);
+                        gameFacade.HandleMovement(key, session);
                     }
                 }
 
@@ -182,92 +178,6 @@ namespace ConsoleApp46
                     }
                 }
             }
-        }
-
-        #endregion
-
-        #region Отображение
-
-        /// <summary>
-        /// Отображает текущую локацию игрока
-        /// </summary>
-        private static void RenderCurrentLocation(GameSession session, Person hero, ref string lastLocation)
-        {
-            ILocationBehavior behavior = LocationBehaviorResolver.Resolve(session);
-            behavior.Render(session, hero, ref lastLocation);
-        }
-
-        #endregion
-
-        #region Сохранение и загрузка
-
-        /// <summary>
-        /// Сохраняет игру
-        /// </summary>
-        private static void SaveGame(Person hero, GameSession session)
-        {
-            Console.Clear();
-            Console.WriteLine("Введите название сохранения:");
-            string name = Console.ReadLine();
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                SaveData.Save(hero, session.FullMap, name, session.PlayerX, session.PlayerY);
-            }
-            Console.WriteLine("Нажмите любую клавишу...");
-            Console.ReadKey();
-        }
-
-        /// <summary>
-        /// Загружает игру
-        /// </summary>
-        private static void LoadGame(Person hero, GameSession session)
-        {
-            Console.Clear();
-            List<string> saves = SaveData.GetSaveList();
-            if (saves.Count == 0)
-            {
-                Console.WriteLine("Сохранения не найдены!");
-            }
-            else
-            {
-                Console.WriteLine("Сохранения:");
-                for (int i = 0; i < saves.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. {saves[i]}");
-                }
-                Console.Write("Выберите номер: ");
-                if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= saves.Count)
-                {
-                    SaveData.Load(saves[choice - 1], hero, session.FullMap, ref session.PlayerX, ref session.PlayerY);
-                    Map.NormalizeWorldMap(session.FullMap, session.PlayerX, session.PlayerY);
-                }
-            }
-            Console.WriteLine("Нажмите любую клавишу...");
-            Console.ReadKey();
-            Console.Clear();
-        }
-
-        #endregion
-
-        #region Обработка движения
-
-        /// <summary>
-        /// Обрабатывает движение игрока
-        /// </summary>
-        private static void HandleMovement(ConsoleKey key, GameSession session, Person hero)
-        {
-            int dx = 0, dy = 0;
-            switch (key)
-            {
-                case ConsoleKey.UpArrow: dx = -1; break;
-                case ConsoleKey.DownArrow: dx = 1; break;
-                case ConsoleKey.LeftArrow: dy = -1; break;
-                case ConsoleKey.RightArrow: dy = 1; break;
-                default: return;
-            }
-
-            ILocationBehavior behavior = LocationBehaviorResolver.Resolve(session);
-            behavior.HandleMovement(session, dx, dy, hero);
         }
 
         #endregion

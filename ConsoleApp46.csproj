@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GameLogic\GameFacade.cs" />
     <Compile Include="GameLogic\LocationBehavior.cs" />
     <Compile Include="GameLogic\LocationFactory.cs" />
     <Compile Include="GameLogic\Map.cs" />
