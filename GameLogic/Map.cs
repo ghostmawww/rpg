@@ -1861,21 +1861,25 @@ namespace ConsoleApp46
 
             if (cell == 'O')
             {
+                UniqueLocationFactory caveFactory = new CaveLocationFactory();
+                UniqueLocationData caveLocation = caveFactory.CreateLocation();
                 inCave = true;
                 puzzleSolved = false;
                 chestOpened = false;
-                cavePlayerX = CaveStartX;
-                cavePlayerY = CaveStartY;
-                caveMap = GenerateRandomLabyrinth();
+                cavePlayerX = caveLocation.PlayerX;
+                cavePlayerY = caveLocation.PlayerY;
+                caveMap = caveLocation.Map;
                 caveMap[cavePlayerX, cavePlayerY] = '@';
                 return;
             }
 
             if (cell == 'T')
             {
-                titanicPlayerX = 12;
-                titanicPlayerY = 12;
-                titanicMap = CreateTitanicMap();
+                UniqueLocationFactory titanicFactory = new TitanicLocationFactory();
+                UniqueLocationData titanicLocation = titanicFactory.CreateLocation();
+                titanicPlayerX = titanicLocation.PlayerX;
+                titanicPlayerY = titanicLocation.PlayerY;
+                titanicMap = titanicLocation.Map;
                 _titanicPlayerBaseCell = '.';
                 titanicMap[titanicPlayerX, titanicPlayerY] = '@';
                 inTitanic = true;
@@ -1884,19 +1888,11 @@ namespace ConsoleApp46
 
             if (cell == 'F')
             {
-                houseMap = CreateHouseMap();
-                housePlayerX = 2;
-                housePlayerY = 2;
-                while (houseMap[housePlayerX, housePlayerY] != '.')
-                {
-                    housePlayerY++;
-                    if (housePlayerY >= 24)
-                    {
-                        housePlayerY = 1;
-                        housePlayerX++;
-                    }
-                }
-
+                UniqueLocationFactory houseFactory = new HouseLocationFactory();
+                UniqueLocationData houseLocation = houseFactory.CreateLocation();
+                houseMap = houseLocation.Map;
+                housePlayerX = houseLocation.PlayerX;
+                housePlayerY = houseLocation.PlayerY;
                 houseMap[housePlayerX, housePlayerY] = '@';
                 inHouse = true;
                 hasReward = false;
