@@ -11,6 +11,8 @@ namespace ConsoleApp46
     [Serializable]
     public class SaveData
     {
+        #region Поля
+
         private string _playerName;
         private int _playerHp;
         private int _playerMaxHp;
@@ -22,79 +24,108 @@ namespace ConsoleApp46
         private List<string> _mapRows;
         private DateTime _saveTime;
 
-        /// <summary>Имя игрока</summary>
+        #endregion
+
+        #region Свойства
+
+        /// <summary>
+        /// Имя игрока
+        /// </summary>
         public string PlayerName
         {
             get => _playerName;
             set => _playerName = value;
         }
 
-        /// <summary>Текущее здоровье игрока</summary>
+        /// <summary>
+        /// Текущее здоровье игрока
+        /// </summary>
         public int PlayerHP
         {
             get => _playerHp;
             set => _playerHp = value;
         }
 
-        /// <summary>Максимальное здоровье игрока</summary>
+        /// <summary>
+        /// Максимальное здоровье игрока
+        /// </summary>
         public int PlayerMaxHP
         {
             get => _playerMaxHp;
             set => _playerMaxHp = value;
         }
 
-        /// <summary>Сила игрока</summary>
+        /// <summary>
+        /// Сила игрока
+        /// </summary>
         public int PlayerStrength
         {
             get => _playerStrength;
             set => _playerStrength = value;
         }
 
-        /// <summary>Количество монет игрока</summary>
+        /// <summary>
+        /// Количество монет игрока
+        /// </summary>
         public int PlayerCoins
         {
             get => _playerCoins;
             set => _playerCoins = value;
         }
 
-        /// <summary>Уровень мира</summary>
+        /// <summary>
+        /// Уровень мира
+        /// </summary>
         public int WorldLevel
         {
             get => _worldLevel;
             set => _worldLevel = value;
         }
 
-        /// <summary>Координата X игрока</summary>
+        /// <summary>
+        /// Координата X игрока
+        /// </summary>
         public int PlayerX
         {
             get => _playerX;
             set => _playerX = value;
         }
 
-        /// <summary>Координата Y игрока</summary>
+        /// <summary>
+        /// Координата Y игрока
+        /// </summary>
         public int PlayerY
         {
             get => _playerY;
             set => _playerY = value;
         }
 
-        /// <summary>Строки карты</summary>
+        /// <summary>
+        /// Строки карты
+        /// </summary>
         public List<string> MapRows
         {
             get => _mapRows;
             set => _mapRows = value;
         }
 
-        /// <summary>Время сохранения</summary>
+        /// <summary>
+        /// Время сохранения
+        /// </summary>
         public DateTime SaveTime
         {
             get => _saveTime;
             set => _saveTime = value;
         }
 
+        #endregion
+
+        #region Конструкторы
+
         /// <summary>
         /// Конструктор по умолчанию
         /// </summary>
+        /// <exception cref="GameException">Выбрасывается при ошибке инициализации</exception>
         public SaveData()
         {
             try
@@ -104,7 +135,7 @@ namespace ConsoleApp46
             }
             catch (Exception ex)
             {
-                throw new GameException("Ошибка инициализации SaveData", "S001", "SaveSystem", ex);
+                throw new GameException("Ошибка инициализации данных сохранения", "S001", "Система сохранений", ex);
             }
         }
 
@@ -115,18 +146,19 @@ namespace ConsoleApp46
         /// <param name="map">Карта мира</param>
         /// <param name="playerX">Координата X игрока</param>
         /// <param name="playerY">Координата Y игрока</param>
+        /// <exception cref="GameException">Выбрасывается при некорректных параметрах</exception>
         public SaveData(Person hero, char[,] map, int playerX, int playerY)
         {
             try
             {
                 if (hero == null)
                 {
-                    throw new GameException("Объект героя не инициализирован", "S002", "SaveSystem", ErrorSeverity.High);
+                    throw new GameException("Объект героя не инициализирован", "S002", "Система сохранений", ErrorSeverity.High);
                 }
 
                 if (map == null)
                 {
-                    throw new GameException("Карта не инициализирована", "S003", "SaveSystem", ErrorSeverity.High);
+                    throw new GameException("Карта не инициализирована", "S003", "Система сохранений", ErrorSeverity.High);
                 }
 
                 _playerName = hero.Name ?? "Безымянный";
@@ -156,21 +188,26 @@ namespace ConsoleApp46
             }
             catch (Exception ex)
             {
-                throw new GameException("Ошибка при создании сохранения", "S004", "SaveSystem", ex);
+                throw new GameException("Ошибка создания данных сохранения", "S004", "Система сохранений", ex);
             }
         }
+
+        #endregion
+
+        #region Методы
 
         /// <summary>
         /// Восстанавливает карту из сохраненных данных
         /// </summary>
         /// <returns>Двумерный массив символов карты</returns>
+        /// <exception cref="GameException">Выбрасывается при отсутствии данных для восстановления</exception>
         public char[,] GetMap()
         {
             try
             {
                 if (_mapRows == null || _mapRows.Count == 0)
                 {
-                    throw new GameException("Нет данных для восстановления карты", "S005", "SaveSystem", ErrorSeverity.High);
+                    throw new GameException("Нет данных для восстановления карты", "S005", "Система сохранений", ErrorSeverity.High);
                 }
 
                 int height = _mapRows.Count;
@@ -208,7 +245,7 @@ namespace ConsoleApp46
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    throw new GameException("Имя файла не может быть пустым", "S006", "SaveSystem", ErrorSeverity.Medium);
+                    throw new GameException("Имя файла не может быть пустым", "S006", "Система сохранений", ErrorSeverity.Medium);
                 }
 
                 if (!Directory.Exists("Saves"))
@@ -252,24 +289,24 @@ namespace ConsoleApp46
         /// <param name="map">Карта для восстановления</param>
         /// <param name="playerX">Координата X игрока</param>
         /// <param name="playerY">Координата Y игрока</param>
-        /// <returns>true, если загрузка успешна</returns>
+        /// <returns>true, если загрузка успешна, иначе false</returns>
         public static bool Load(string fileName, Person hero, char[,] map, ref int playerX, ref int playerY)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(fileName))
                 {
-                    throw new GameException("Имя файла не может быть пустым", "S007", "SaveSystem", ErrorSeverity.Medium);
+                    throw new GameException("Имя файла не может быть пустым", "S007", "Система сохранений", ErrorSeverity.Medium);
                 }
 
                 if (hero == null)
                 {
-                    throw new GameException("Объект героя не инициализирован", "S008", "SaveSystem", ErrorSeverity.High);
+                    throw new GameException("Объект героя не инициализирован", "S008", "Система сохранений", ErrorSeverity.High);
                 }
 
                 if (map == null)
                 {
-                    throw new GameException("Карта не инициализирована", "S009", "SaveSystem", ErrorSeverity.High);
+                    throw new GameException("Карта не инициализирована", "S009", "Система сохранений", ErrorSeverity.High);
                 }
 
                 string path = $"Saves/{fileName}.xml";
@@ -358,5 +395,7 @@ namespace ConsoleApp46
 
             return saves;
         }
+
+        #endregion
     }
 }

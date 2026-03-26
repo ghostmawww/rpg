@@ -7,10 +7,16 @@ namespace ConsoleApp46
     /// </summary>
     public class GameException : Exception
     {
+        #region Поля
+
         private string _errorCode;
         private DateTime _errorTime;
         private ErrorSeverity _severity;
         private string _component;
+
+        #endregion
+
+        #region Свойства
 
         /// <summary>
         /// Уникальный код ошибки
@@ -48,6 +54,10 @@ namespace ConsoleApp46
             set => _component = value;
         }
 
+        #endregion
+
+        #region Конструкторы
+
         /// <summary>
         /// Конструктор по умолчанию
         /// </summary>
@@ -55,7 +65,7 @@ namespace ConsoleApp46
         {
             _errorTime = DateTime.Now;
             _severity = ErrorSeverity.Medium;
-            _component = "Unknown";
+            _component = "Неизвестно";
         }
 
         /// <summary>
@@ -66,7 +76,7 @@ namespace ConsoleApp46
         {
             _errorTime = DateTime.Now;
             _severity = ErrorSeverity.Medium;
-            _component = "Unknown";
+            _component = "Неизвестно";
         }
 
         /// <summary>
@@ -79,7 +89,7 @@ namespace ConsoleApp46
             _errorCode = errorCode;
             _errorTime = DateTime.Now;
             _severity = ErrorSeverity.Medium;
-            _component = "Unknown";
+            _component = "Неизвестно";
         }
 
         /// <summary>
@@ -153,8 +163,12 @@ namespace ConsoleApp46
         {
             _errorTime = DateTime.Now;
             _severity = ErrorSeverity.High;
-            _component = "Unknown";
+            _component = "Неизвестно";
         }
+
+        #endregion
+
+        #region Методы
 
         /// <summary>
         /// Возвращает форматированное сообщение об ошибке
@@ -162,27 +176,30 @@ namespace ConsoleApp46
         /// <returns>Строка с подробной информацией об ошибке</returns>
         public override string ToString()
         {
-            string severityText;
+            string severityText = GetSeverityText();
+
+            return $"[{_errorTime:yyyy-MM-dd HH:mm:ss}] Компонент: {_component ?? "Н/Д"} | Код: {_errorCode ?? "Н/Д"} | Критичность: {severityText}\nСообщение: {Message}";
+        }
+
+        /// <summary>
+        /// Возвращает текстовое представление уровня критичности
+        /// </summary>
+        /// <returns>Текстовое представление уровня критичности</returns>
+        private string GetSeverityText()
+        {
             switch (_severity)
             {
                 case ErrorSeverity.Low:
-                    severityText = "Низкая";
-                    break;
+                    return "Низкая";
                 case ErrorSeverity.Medium:
-                    severityText = "Средняя";
-                    break;
+                    return "Средняя";
                 case ErrorSeverity.High:
-                    severityText = "Высокая";
-                    break;
+                    return "Высокая";
                 case ErrorSeverity.Critical:
-                    severityText = "Критическая";
-                    break;
+                    return "Критическая";
                 default:
-                    severityText = "Неизвестно";
-                    break;
+                    return "Неизвестная";
             }
-
-            return $"[{_errorTime:yyyy-MM-dd HH:mm:ss}] Компонент: {_component ?? "N/A"} | Код: {_errorCode ?? "N/A"} | Уровень: {severityText}\nСообщение: {Message}";
         }
 
         /// <summary>
@@ -193,6 +210,8 @@ namespace ConsoleApp46
         {
             return $"[{_errorCode}] {Message}";
         }
+
+        #endregion
     }
 
     /// <summary>
