@@ -26,52 +26,53 @@ namespace ConsoleApp46
 
                 Person hero = CreateHero(heroName);
 
-                char[,] fullMap = Map.CreateFullMap();
-                if (fullMap == null)
+                GameSession session = new GameSession
+                {
+                    FullMap = Map.CreateFullMap()
+                };
+
+                if (session.FullMap == null)
                 {
                     throw new GameException("Не удалось создать карту", "P001", "Программа", ErrorSeverity.Critical);
                 }
 
-                int playerX = fullMap.GetLength(0) / 2;
-                int playerY = fullMap.GetLength(1) / 2;
+                session.PlayerX = session.FullMap.GetLength(0) / 2;
+                session.PlayerY = session.FullMap.GetLength(1) / 2;
 
-                InitializeGameState(out bool inCave, out char[,] caveMap, out int cavePlayerX, out int cavePlayerY, out bool puzzleSolved, out bool chestOpened);
-                InitializeTitanicState(out bool inTitanic, out char[,] titanicMap, out int titanicPlayerX, out int titanicPlayerY, out int fishCount);
-                InitializeHouseState(out bool inHouse, out char[,] houseMap, out int housePlayerX, out int housePlayerY, out bool hasReward, out int catX, out int catY, out bool catCatched,
-                    out bool fishEquipped, out bool fishDropped, out int droppedFishX, out int droppedFishY);
-                bool hasFish = false;
+                InitializeGameState(session);
+                InitializeTitanicState(session);
+                InitializeHouseState(session);
                 string lastLocation = "world";
                 int lastMoveDx = 0;
                 int lastMoveDy = 1;
 
-                ClearAreaAroundPlayer(fullMap, playerX, playerY);
+                ClearAreaAroundPlayer(session.FullMap, session.PlayerX, session.PlayerY);
 
                 while (hero.HP > 0)
                 {
-                    RenderCurrentLocation(inCave, caveMap, hero, puzzleSolved, chestOpened, inTitanic, titanicMap, fishCount, inHouse, houseMap, hasFish, hasReward, catCatched,
-                        fishEquipped, fishDropped, fullMap, playerX, playerY, ref lastLocation);
+                    RenderCurrentLocation(session, hero, ref lastLocation);
 
                     ConsoleKey key = Console.ReadKey(true).Key;
 
                     if (key == ConsoleKey.S)
                     {
-                        SaveGame(hero, fullMap, playerX, playerY);
+                        SaveGame(hero, session);
                     }
                     else if (key == ConsoleKey.L)
                     {
-                        LoadGame(hero, fullMap, ref playerX, ref playerY);
+                        LoadGame(hero, session);
                     }
                     else if (key == ConsoleKey.I)
                     {
                         Console.Clear();
-                        fishEquipped = Map.ShowInventory(hero, fishCount, false, fishEquipped);
+                        session.FishEquipped = Map.ShowInventory(hero, session.FishCount, false, session.FishEquipped);
                         Console.Clear();
                         lastLocation = string.Empty;
                     }
-                    else if (key == ConsoleKey.Spacebar && inHouse)
+                    else if (key == ConsoleKey.Spacebar && session.InHouse)
                     {
-                        Map.ThrowFishInHouse(ref houseMap, housePlayerX, housePlayerY, lastMoveDx, lastMoveDy,
-                            ref fishCount, ref hasFish, ref fishEquipped, ref fishDropped, ref droppedFishX, ref droppedFishY);
+                        Map.ThrowFishInHouse(ref session.HouseMap, session.HousePlayerX, session.HousePlayerY, lastMoveDx, lastMoveDy,
+                            ref session.FishCount, ref session.HasFish, ref session.FishEquipped, ref session.FishDropped, ref session.DroppedFishX, ref session.DroppedFishY);
                     }
                     else
                     {
@@ -80,11 +81,7 @@ namespace ConsoleApp46
                         else if (key == ConsoleKey.LeftArrow) { lastMoveDx = 0; lastMoveDy = -1; }
                         else if (key == ConsoleKey.RightArrow) { lastMoveDx = 0; lastMoveDy = 1; }
 
-                        HandleMovement(key, ref playerX, ref playerY, fullMap, hero,
-                            ref inCave, ref caveMap, ref cavePlayerX, ref cavePlayerY, ref puzzleSolved, ref chestOpened,
-                            ref inTitanic, ref titanicMap, ref titanicPlayerX, ref titanicPlayerY, ref fishCount, ref hasFish,
-                            ref inHouse, ref houseMap, ref housePlayerX, ref housePlayerY,
-                            ref hasReward, ref catX, ref catY, ref catCatched, ref fishEquipped, ref fishDropped, ref droppedFishX, ref droppedFishY);
+                        HandleMovement(key, session, hero);
                     }
                 }
 
@@ -128,46 +125,46 @@ namespace ConsoleApp46
         /// <summary>
         /// Инициализирует состояние пещеры
         /// </summary>
-        private static void InitializeGameState(out bool inCave, out char[,] caveMap, out int cavePlayerX, out int cavePlayerY, out bool puzzleSolved, out bool chestOpened)
+        private static void InitializeGameState(GameSession session)
         {
-            inCave = false;
-            caveMap = null;
-            cavePlayerX = 0;
-            cavePlayerY = 0;
-            puzzleSolved = false;
-            chestOpened = false;
+            session.InCave = false;
+            session.CaveMap = null;
+            session.CavePlayerX = 0;
+            session.CavePlayerY = 0;
+            session.PuzzleSolved = false;
+            session.ChestOpened = false;
         }
 
         /// <summary>
         /// Инициализирует состояние Титаника
         /// </summary>
-        private static void InitializeTitanicState(out bool inTitanic, out char[,] titanicMap, out int titanicPlayerX, out int titanicPlayerY, out int fishCount)
+        private static void InitializeTitanicState(GameSession session)
         {
-            inTitanic = false;
-            titanicMap = null;
-            titanicPlayerX = 0;
-            titanicPlayerY = 0;
-            fishCount = 0;
+            session.InTitanic = false;
+            session.TitanicMap = null;
+            session.TitanicPlayerX = 0;
+            session.TitanicPlayerY = 0;
+            session.FishCount = 0;
+            session.HasFish = false;
         }
 
         /// <summary>
         /// Инициализирует состояние домика
         /// </summary>
-        private static void InitializeHouseState(out bool inHouse, out char[,] houseMap, out int housePlayerX, out int housePlayerY, out bool hasReward, out int catX, out int catY, out bool catCatched,
-            out bool fishEquipped, out bool fishDropped, out int droppedFishX, out int droppedFishY)
+        private static void InitializeHouseState(GameSession session)
         {
-            inHouse = false;
-            houseMap = null;
-            housePlayerX = 0;
-            housePlayerY = 0;
-            hasReward = false;
-            catX = 0;
-            catY = 0;
-            catCatched = false;
-            fishEquipped = false;
-            fishDropped = false;
-            droppedFishX = -1;
-            droppedFishY = -1;
+            session.InHouse = false;
+            session.HouseMap = null;
+            session.HousePlayerX = 0;
+            session.HousePlayerY = 0;
+            session.HasReward = false;
+            session.CatX = 0;
+            session.CatY = 0;
+            session.CatCatched = false;
+            session.FishEquipped = false;
+            session.FishDropped = false;
+            session.DroppedFishX = -1;
+            session.DroppedFishY = -1;
         }
 
         /// <summary>
@@ -194,37 +191,10 @@ namespace ConsoleApp46
         /// <summary>
         /// Отображает текущую локацию игрока
         /// </summary>
-        private static void RenderCurrentLocation(bool inCave, char[,] caveMap, Person hero, bool puzzleSolved, bool chestOpened,
-            bool inTitanic, char[,] titanicMap, int fishCount, bool inHouse, char[,] houseMap, bool hasFish, bool hasReward, bool catCatched,
-            bool fishEquipped, bool fishDropped, char[,] fullMap, int playerX, int playerY, ref string lastLocation)
+        private static void RenderCurrentLocation(GameSession session, Person hero, ref string lastLocation)
         {
-            string currentLocation = "world";
-            if (inCave) currentLocation = "cave";
-            else if (inTitanic) currentLocation = "titanic";
-            else if (inHouse) currentLocation = "house";
-
-            if (currentLocation != lastLocation)
-            {
-                Console.Clear();
-                lastLocation = currentLocation;
-            }
-
-            if (inCave)
-            {
-                Map.RenderCaveWithPuzzle(caveMap, hero, puzzleSolved, chestOpened);
-            }
-            else if (inTitanic)
-            {
-                Map.RenderTitanicMap(titanicMap, hero, fishCount);
-            }
-            else if (inHouse)
-            {
-                Map.RenderHouseMap(houseMap, hero, hasFish, hasReward, catCatched, fishEquipped, fishDropped);
-            }
-            else
-            {
-                Map.RenderWorldMap(fullMap, playerX, playerY, hero);
-            }
+            ILocationBehavior behavior = LocationBehaviorResolver.Resolve(session);
+            behavior.Render(session, hero, ref lastLocation);
         }
 
         #endregion
@@ -234,14 +204,14 @@ namespace ConsoleApp46
         /// <summary>
         /// Сохраняет игру
         /// </summary>
-        private static void SaveGame(Person hero, char[,] fullMap, int playerX, int playerY)
+        private static void SaveGame(Person hero, GameSession session)
         {
             Console.Clear();
             Console.WriteLine("Введите название сохранения:");
             string name = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(name))
             {
-                SaveData.Save(hero, fullMap, name, playerX, playerY);
+                SaveData.Save(hero, session.FullMap, name, session.PlayerX, session.PlayerY);
             }
             Console.WriteLine("Нажмите любую клавишу...");
             Console.ReadKey();
@@ -250,7 +220,7 @@ namespace ConsoleApp46
         /// <summary>
         /// Загружает игру
         /// </summary>
-        private static void LoadGame(Person hero, char[,] fullMap, ref int playerX, ref int playerY)
+        private static void LoadGame(Person hero, GameSession session)
         {
             Console.Clear();
             List<string> saves = SaveData.GetSaveList();
@@ -268,8 +238,8 @@ namespace ConsoleApp46
                 Console.Write("Выберите номер: ");
                 if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= saves.Count)
                 {
-                    SaveData.Load(saves[choice - 1], hero, fullMap, ref playerX, ref playerY);
-                    Map.NormalizeWorldMap(fullMap, playerX, playerY);
+                    SaveData.Load(saves[choice - 1], hero, session.FullMap, ref session.PlayerX, ref session.PlayerY);
+                    Map.NormalizeWorldMap(session.FullMap, session.PlayerX, session.PlayerY);
                 }
             }
             Console.WriteLine("Нажмите любую клавишу...");
@@ -284,12 +254,7 @@ namespace ConsoleApp46
         /// <summary>
         /// Обрабатывает движение игрока
         /// </summary>
-        private static void HandleMovement(ConsoleKey key, ref int playerX, ref int playerY, char[,] fullMap, Person hero,
-            ref bool inCave, ref char[,] caveMap, ref int cavePlayerX, ref int cavePlayerY, ref bool puzzleSolved, ref bool chestOpened,
-            ref bool inTitanic, ref char[,] titanicMap, ref int titanicPlayerX, ref int titanicPlayerY, ref int fishCount, ref bool hasFish,
-            ref bool inHouse, ref char[,] houseMap, ref int housePlayerX, ref int housePlayerY,
-            ref bool hasReward, ref int catX, ref int catY, ref bool catCatched,
-            ref bool fishEquipped, ref bool fishDropped, ref int droppedFishX, ref int droppedFishY)
+        private static void HandleMovement(ConsoleKey key, GameSession session, Person hero)
         {
             int dx = 0, dy = 0;
             switch (key)
@@ -301,30 +266,8 @@ namespace ConsoleApp46
                 default: return;
             }
 
-            if (inCave)
-            {
-                Map.MoveInCaveWithPuzzle(ref cavePlayerX, ref cavePlayerY, dx, dy,
-                    ref caveMap, ref inCave, ref puzzleSolved, ref chestOpened, hero);
-            }
-            else if (inTitanic)
-            {
-                Map.MoveInTitanic(ref titanicPlayerX, ref titanicPlayerY, dx, dy, titanicMap, ref inTitanic, hero, ref fishCount, ref hasFish);
-            }
-            else if (inHouse)
-            {
-                Map.MoveInHouse(ref housePlayerX, ref housePlayerY, dx, dy,
-                    ref houseMap, ref inHouse, ref hasFish, ref hasReward, ref catX, ref catY, ref catCatched, ref fishCount, hero,
-                    ref fishEquipped, ref fishDropped, ref droppedFishX, ref droppedFishY);
-            }
-            else
-            {
-                Map.MovePlayer(ref playerX, ref playerY, dx, dy, fullMap, hero,
-                    ref inCave, ref caveMap, ref cavePlayerX, ref cavePlayerY, ref puzzleSolved, ref chestOpened,
-                    ref inTitanic, ref titanicMap, ref titanicPlayerX, ref titanicPlayerY,
-                    ref inHouse, ref houseMap, ref housePlayerX, ref housePlayerY,
-                    ref hasFish, ref hasReward, ref catX, ref catY,
-                    ref catCatched, ref fishCount);
-            }
+            ILocationBehavior behavior = LocationBehaviorResolver.Resolve(session);
+            behavior.HandleMovement(session, dx, dy, hero);
         }
 
         #endregion
