@@ -414,6 +414,24 @@ namespace ConsoleApp46
         }
 
         /// <summary>
+        /// Проверяет, является ли клетка зоной всплытия в Титанике.
+        /// </summary>
+        private static bool IsTitanicSurfaceCell(int x, int y, char cell)
+        {
+            if (x < 0 || x >= 25 || y < 0 || y >= 25)
+            {
+                return false;
+            }
+
+            if (x != 0 && x != 24 && y != 0 && y != 24)
+            {
+                return false;
+            }
+
+            return cell != '#';
+        }
+
+        /// <summary>
         /// Выводит одну цветную клетку.
         /// </summary>
         /// <param name="cell">Символ клетки.</param>
@@ -1287,42 +1305,79 @@ namespace ConsoleApp46
                 }
             }
 
-            for (int i = 0; i < 25; i++)
+            int[] leftBounds =
             {
-                titanicMap[0, i] = '.';
-                titanicMap[24, i] = '.';
-                titanicMap[i, 0] = '.';
-                titanicMap[i, 24] = '.';
+                0, 0, 11, 10, 9, 8, 7, 6, 5, 4, 4, 4, 4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11, 0, 0
+            };
+            int[] rightBounds =
+            {
+                0, 0, 13, 14, 15, 16, 17, 18, 19, 20, 20, 20, 20, 20, 20, 20, 19, 18, 17, 16, 15, 14, 13, 0, 0
+            };
+
+            for (int x = 2; x <= 22; x++)
+            {
+                for (int y = leftBounds[x]; y <= rightBounds[x]; y++)
+                {
+                    titanicMap[x, y] = '.';
+                }
             }
 
-            for (int i = 6; i <= 18; i++)
-                for (int j = 5; j <= 20; j++)
-                    titanicMap[i, j] = '.';
-
-            for (int i = 6; i <= 18; i++)
+            for (int x = 2; x <= 22; x++)
             {
-                titanicMap[i, 5] = '#';
-                titanicMap[i, 20] = '#';
+                for (int y = leftBounds[x]; y <= rightBounds[x]; y++)
+                {
+                    if (x == 2 || x == 22 || y == leftBounds[x] || y == rightBounds[x])
+                    {
+                        titanicMap[x, y] = '#';
+                    }
+                }
             }
 
-            for (int j = 5; j <= 20; j++)
+            int[] roomRows = { 6, 10, 14, 18 };
+            int[] roomCols = { 8, 12, 16 };
+
+            foreach (int row in roomRows)
             {
-                titanicMap[6, j] = '#';
-                titanicMap[18, j] = '#';
+                for (int y = leftBounds[row] + 1; y <= rightBounds[row] - 1; y++)
+                {
+                    bool isDoorColumn =
+                        y == (leftBounds[row] + rightBounds[row]) / 2 ||
+                        y == leftBounds[row] + 2 ||
+                        y == rightBounds[row] - 2;
+
+                    if (!isDoorColumn)
+                    {
+                        titanicMap[row, y] = '#';
+                    }
+                }
             }
 
-            titanicMap[12, 5] = '.';
+            foreach (int col in roomCols)
+            {
+                for (int x = 3; x <= 21; x++)
+                {
+                    if (leftBounds[x] == 0 || rightBounds[x] == 0)
+                    {
+                        continue;
+                    }
+
+                    if (col > leftBounds[x] && col < rightBounds[x])
+                    {
+                        bool isDoorRow = x == 4 || x == 5 || x == 9 || x == 13 || x == 17 || x == 20;
+                        if (!isDoorRow)
+                        {
+                            titanicMap[x, col] = '#';
+                        }
+                    }
+                }
+            }
+
             titanicMap[12, 20] = '.';
-            titanicMap[12, 23] = 'T';
-
-            for (int i = 8; i <= 16; i++)
-            {
-                titanicMap[i, 10] = '#';
-                titanicMap[i, 15] = '#';
-            }
-
-            titanicMap[11, 10] = '.';
-            titanicMap[14, 15] = '.';
+            titanicMap[12, 21] = 'T';
+            titanicMap[12, leftBounds[12]] = '.';
+            titanicMap[12, rightBounds[12]] = '.';
+            titanicMap[12, 8] = '.';
+            titanicMap[12, 16] = '.';
 
             for (int i = 0; i < 12; i++)
             {
@@ -1355,14 +1410,20 @@ namespace ConsoleApp46
         {
             CharInfo[] buffer = CreateFrameBuffer(FrameWidth, FrameHeight);
             PutBufferText(buffer, FrameWidth, FrameHeight, 0, 0, "ТИТАНИК", ConsoleColor.White);
-            PutBufferText(buffer, FrameWidth, FrameHeight, 0, 1, "~ вода | # стены | T выход | F рыба | W водоросли | * течение", ConsoleColor.White);
+            PutBufferText(buffer, FrameWidth, FrameHeight, 0, 1, "Красные края - всплытие | ~ вода | # стены | T выход | F рыба | W водоросли | * течение", ConsoleColor.White);
             PutBufferText(buffer, FrameWidth, FrameHeight, 0, 2, hero.HasAquaLung ? "Акваланг: -1 HP за шаг" : "Без акваланга: -5 HP за шаг", ConsoleColor.White);
 
             for (int i = 0; i < 25; i++)
             {
                 for (int j = 0; j < 25; j++)
                 {
-                    PutMapCell(buffer, FrameWidth, FrameHeight, j, i + 4, titanicMap[i, j], GetCellColor(titanicMap[i, j]));
+                    ConsoleColor color = GetCellColor(titanicMap[i, j]);
+                    if (IsTitanicSurfaceCell(i, j, titanicMap[i, j]))
+                    {
+                        color = ConsoleColor.Red;
+                    }
+
+                    PutMapCell(buffer, FrameWidth, FrameHeight, j, i + 4, titanicMap[i, j], color);
                 }
             }
 
@@ -1383,6 +1444,14 @@ namespace ConsoleApp46
             if (nx < 0 || nx >= 25 || ny < 0 || ny >= 25) return;
 
             char cell = map[nx, ny];
+
+            if (IsTitanicSurfaceCell(nx, ny, cell))
+            {
+                inTitanic = false;
+                hasFish = fishCount > 0;
+                SetStatusMessage("Вы всплыли на поверхность.", ConsoleColor.Cyan);
+                return;
+            }
 
             if (cell == 'T')
             {
@@ -1405,7 +1474,7 @@ namespace ConsoleApp46
                 SetStatusMessage("Вы нашли рыбу.", ConsoleColor.Yellow);
             }
 
-            if (cell == '~' || cell == '*' || cell == 'F')
+            if ((cell == '~' || cell == '*' || cell == 'F') && !IsTitanicSurfaceCell(nx, ny, cell))
             {
                 int hpLoss = hero.HasAquaLung ? 1 : 5;
                 hero.HP -= hpLoss;
