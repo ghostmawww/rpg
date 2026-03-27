@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace ConsoleApp46
-{
+{   // структурный паттерн
     /// <summary>
     /// Предоставляет упрощенный интерфейс для работы с основными игровыми подсистемами.
     /// </summary>

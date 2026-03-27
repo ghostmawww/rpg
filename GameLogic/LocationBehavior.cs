@@ -1,7 +1,7 @@
 using System;
 
 namespace ConsoleApp46
-{
+{   //поведенческий паттерн
     /// <summary>
     /// Хранит текущее состояние игры и уникальных локаций.
     /// </summary>

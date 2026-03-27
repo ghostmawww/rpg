@@ -1,7 +1,7 @@
 using System;
 
 namespace ConsoleApp46
-{
+{   //порождающий паттерн
     /// <summary>
     /// Данные созданной уникальной локации.
     /// </summary>
