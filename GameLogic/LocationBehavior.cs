@@ -187,7 +187,7 @@ namespace ConsoleApp46
 
             RenderCore(session, hero);
         }
-
+        //
         /// <summary>
         /// Выполняет фактическую отрисовку локации.
         /// </summary>
